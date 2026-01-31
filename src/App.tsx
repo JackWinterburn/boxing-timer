@@ -139,7 +139,7 @@ export default function App() {
             
             <div className="flex flex-col items-center justify-center z-10">
               <div className={cn(
-                "text-8xl sm:text-9xl font-black tracking-[-0.05em] leading-none",
+                "text-9xl sm:text-[11rem] font-black tracking-[-0.05em] leading-none",
                 phase === 'work' ? "text-[#54f085] [text-shadow:0_0_20px_rgba(84,240,133,0.5)]" : "text-orange-400"
               )}>
                 {formatTime(timeLeft)}
