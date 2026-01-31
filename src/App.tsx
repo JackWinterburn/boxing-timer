@@ -86,7 +86,7 @@ function TimerPage() {
     : (1 - timeLeft / restTime) * 100;
 
   return (
-    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 px-4 pt-2 pb-8 safe-area-inset overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 px-4 pt-2 pb-24 safe-area-inset overflow-hidden">
       <div className="flex-1 flex flex-col max-w-md mx-auto w-full overflow-hidden">
         {/* Header */}
         <header className="flex items-center justify-between py-4">
