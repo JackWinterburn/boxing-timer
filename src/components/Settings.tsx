@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { ChevronLeft, Clock, Coffee, Volume2, Smartphone, Zap, Timer, Bell } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Coffee, Volume2, Smartphone, Zap, Timer, Bell } from 'lucide-react';
 import { currentPageAtom, activeWorkoutAtom, appStateAtom, timeLeftAtom, currentRoundAtom, phaseAtom, totalTimeElapsedAtom, isRunningAtom } from '../atoms';
 import { WorkoutConfig, DEFAULT_WORKOUT } from '../types';
 import { saveWorkout, generateId, saveAppState, setActiveWorkout } from '../storage';
@@ -11,11 +11,80 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const formatDuration = (seconds: number) => {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-};
+interface ScrollPickerProps {
+  value: number;
+  min: number;
+  max: number;
+  onChange: (value: number) => void;
+  padZero?: boolean;
+}
+
+function ScrollPicker({ value, min, max, onChange, padZero = true }: ScrollPickerProps) {
+  const values = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+  const currentIndex = values.indexOf(value);
+  
+  const prevValue = currentIndex > 0 ? values[currentIndex - 1] : null;
+  const nextValue = currentIndex < values.length - 1 ? values[currentIndex + 1] : null;
+  
+  const format = (v: number | null) => {
+    if (v === null) return '';
+    return padZero ? v.toString().padStart(2, '0') : v.toString();
+  };
+
+  const handleUp = () => {
+    if (currentIndex > 0) {
+      onChange(values[currentIndex - 1]);
+    }
+  };
+
+  const handleDown = () => {
+    if (currentIndex < values.length - 1) {
+      onChange(values[currentIndex + 1]);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center w-20">
+      <button 
+        onClick={handleUp}
+        className="text-white/30 text-lg font-medium h-8 bg-transparent border-none"
+      >
+        {format(prevValue)}
+      </button>
+      <div className="bg-[#1a3a2a] rounded-lg px-4 py-2 my-1">
+        <span className="text-[#54f085] text-2xl font-black">{format(value)}</span>
+      </div>
+      <button 
+        onClick={handleDown}
+        className="text-white/30 text-lg font-medium h-8 bg-transparent border-none"
+      >
+        {format(nextValue)}
+      </button>
+    </div>
+  );
+}
+
+interface ToggleSwitchProps {
+  enabled: boolean;
+  onChange: () => void;
+}
+
+function ToggleSwitch({ enabled, onChange }: ToggleSwitchProps) {
+  return (
+    <button
+      onClick={onChange}
+      className={cn(
+        "w-12 h-7 rounded-full transition-colors border-none relative",
+        enabled ? "bg-[#54f085]" : "bg-white/20"
+      )}
+    >
+      <div className={cn(
+        "w-5 h-5 bg-white rounded-full absolute top-1 transition-all",
+        enabled ? "right-1" : "left-1"
+      )} />
+    </button>
+  );
+}
 
 export default function Settings() {
   const [, setCurrentPage] = useAtom(currentPageAtom);
@@ -28,6 +97,8 @@ export default function Settings() {
   const [, setIsRunning] = useAtom(isRunningAtom);
   
   const [workout, setWorkout] = useState<WorkoutConfig>({ ...activeWorkout });
+  const [showRoundPicker, setShowRoundPicker] = useState(false);
+  const [showRestPicker, setShowRestPicker] = useState(false);
 
   useEffect(() => {
     if (activeWorkout.id === 'new') {
@@ -78,23 +149,36 @@ export default function Settings() {
     setWorkout(prev => ({ ...prev, ...updates }));
   };
 
+  const roundMinutes = Math.floor(workout.roundDuration / 60);
+  const roundSeconds = workout.roundDuration % 60;
+  const restMinutes = Math.floor(workout.restDuration / 60);
+  const restSeconds = workout.restDuration % 60;
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const sliderMarks = [1, 6, 12, 18, 24];
+
   return (
-    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans p-4 pb-8 overflow-y-auto">
-      <div className="flex-1 flex flex-col max-w-md mx-auto w-full">
+    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans overflow-y-auto">
+      <div className="flex-1 flex flex-col max-w-md mx-auto w-full px-4 pb-8">
         {/* Header */}
-        <header className="flex items-center gap-4 py-4 mb-6">
+        <header className="flex items-center gap-3 py-4 sticky top-0 bg-[#0d1410] z-10">
           <button 
             onClick={handleBack}
             className="p-2 hover:bg-white/5 rounded-full transition-colors border-none bg-transparent"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-sm font-black tracking-[0.2em] uppercase text-white/90">Custom Workout Settings</h1>
+          <h1 className="text-sm font-bold">Custom Workout Settings</h1>
         </header>
 
         {/* Workout Name */}
-        <div className="mb-8">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#54f085] block mb-3">
+        <div className="mt-4 mb-6">
+          <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#54f085] block mb-2">
             Workout Name
           </label>
           <input
@@ -102,160 +186,173 @@ export default function Settings() {
             value={workout.name}
             onChange={(e) => updateWorkout({ name: e.target.value })}
             placeholder="e.g., Morning Sparring"
-            className="w-full bg-transparent border-b border-white/20 py-3 text-lg font-medium placeholder:text-white/30 focus:outline-none focus:border-[#54f085] transition-colors"
+            className="w-full bg-transparent border-none py-2 text-lg text-white/50 placeholder:text-white/30 focus:outline-none focus:text-white"
           />
         </div>
 
         {/* Workout Parameters */}
-        <div className="mb-8">
-          <h2 className="text-base font-black mb-6">Workout Parameters</h2>
+        <div className="mb-6">
+          <h2 className="text-base font-bold mb-4">Workout Parameters</h2>
           
           {/* Round Duration */}
-          <div className="flex items-center justify-between py-4 border-b border-white/5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#54f085]/10 rounded-lg flex items-center justify-center">
-                <Clock className="w-4 h-4 text-[#54f085]" />
-              </div>
-              <div>
-                <p className="font-bold text-sm">Round Duration</p>
-                <p className="text-[10px] text-white/40">Standard training length</p>
-              </div>
-            </div>
+          <div className="mb-4">
             <button 
-              onClick={() => {
-                const mins = Math.floor(workout.roundDuration / 60);
-                const newMins = mins === 5 ? 1 : mins + 1;
-                updateWorkout({ roundDuration: newMins * 60 });
-              }}
-              className="text-[#54f085] font-bold text-lg bg-transparent border-none"
+              onClick={() => setShowRoundPicker(!showRoundPicker)}
+              className="w-full flex items-center justify-between py-3 bg-transparent border-none"
             >
-              {formatDuration(workout.roundDuration)}
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-[#1a3a2a] rounded-lg flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-[#54f085]" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm">Round Duration</p>
+                  <p className="text-[10px] text-white/40">Standard training length</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[#54f085] font-bold">{formatTime(workout.roundDuration)}</span>
+                <ChevronRight className={cn("w-4 h-4 text-white/40 transition-transform", showRoundPicker && "rotate-90")} />
+              </div>
             </button>
+            
+            {showRoundPicker && (
+              <div className="flex items-center justify-center gap-2 py-4 bg-[#0f1a14] rounded-xl mt-2">
+                <ScrollPicker 
+                  value={roundMinutes} 
+                  min={0} 
+                  max={10} 
+                  onChange={(v) => updateWorkout({ roundDuration: v * 60 + roundSeconds })}
+                />
+                <span className="text-2xl font-bold text-white/50">:</span>
+                <ScrollPicker 
+                  value={roundSeconds} 
+                  min={0} 
+                  max={59} 
+                  onChange={(v) => updateWorkout({ roundDuration: roundMinutes * 60 + v })}
+                />
+              </div>
+            )}
           </div>
 
           {/* Rest Duration */}
-          <div className="flex items-center justify-between py-4 border-b border-white/5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#54f085]/10 rounded-lg flex items-center justify-center">
-                <Coffee className="w-4 h-4 text-[#54f085]" />
-              </div>
-              <div>
-                <p className="font-bold text-sm">Rest Duration</p>
-              </div>
-            </div>
+          <div className="mb-6">
             <button 
-              onClick={() => {
-                const secs = workout.restDuration;
-                const newSecs = secs >= 120 ? 30 : secs + 30;
-                updateWorkout({ restDuration: newSecs });
-              }}
-              className="text-[#54f085] font-bold text-lg bg-transparent border-none"
+              onClick={() => setShowRestPicker(!showRestPicker)}
+              className="w-full flex items-center justify-between py-3 bg-transparent border-none"
             >
-              {formatDuration(workout.restDuration)}
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-[#1a3a2a] rounded-lg flex items-center justify-center">
+                  <Coffee className="w-4 h-4 text-[#54f085]" />
+                </div>
+                <p className="font-medium text-sm">Rest Duration</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[#54f085] font-bold">{formatTime(workout.restDuration)}</span>
+                <ChevronRight className={cn("w-4 h-4 text-white/40 transition-transform", showRestPicker && "rotate-90")} />
+              </div>
             </button>
+            
+            {showRestPicker && (
+              <div className="flex items-center justify-center gap-2 py-4 bg-[#0f1a14] rounded-xl mt-2">
+                <ScrollPicker 
+                  value={restMinutes} 
+                  min={0} 
+                  max={10} 
+                  onChange={(v) => updateWorkout({ restDuration: v * 60 + restSeconds })}
+                />
+                <span className="text-2xl font-bold text-white/50">:</span>
+                <ScrollPicker 
+                  value={restSeconds} 
+                  min={0} 
+                  max={59} 
+                  onChange={(v) => updateWorkout({ restDuration: restMinutes * 60 + v })}
+                />
+              </div>
+            )}
           </div>
 
           {/* Total Rounds */}
-          <div className="py-6">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Total Rounds</p>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#54f085]">Pro Setting</span>
+          <div className="mb-2">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/40">Total Rounds</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#54f085]">Pro Setting</span>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-4xl font-black">{workout.totalRounds}</span>
+            <div className="flex items-baseline gap-2 mb-4">
+              <span className="text-3xl font-black">{workout.totalRounds}</span>
               <span className="text-sm text-white/40">rounds</span>
             </div>
-            <input
-              type="range"
-              min="1"
-              max="24"
-              value={workout.totalRounds}
-              onChange={(e) => updateWorkout({ totalRounds: parseInt(e.target.value) })}
-              className="w-full mt-4 accent-[#54f085]"
-            />
-            <div className="flex justify-between text-[10px] text-white/30 mt-2">
-              <span>1</span>
-              <span>6</span>
-              <span>12</span>
-              <span>18</span>
-              <span>24</span>
+            
+            {/* Custom Slider */}
+            <div className="relative pt-2 pb-6">
+              <input
+                type="range"
+                min="1"
+                max="24"
+                value={workout.totalRounds}
+                onChange={(e) => updateWorkout({ totalRounds: parseInt(e.target.value) })}
+                className="w-full h-1 bg-[#1a3a2a] rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-[#54f085] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(84,240,133,0.5)]"
+                style={{
+                  background: `linear-gradient(to right, #54f085 0%, #54f085 ${((workout.totalRounds - 1) / 23) * 100}%, #1a3a2a ${((workout.totalRounds - 1) / 23) * 100}%, #1a3a2a 100%)`
+                }}
+              />
+              <div className="flex justify-between mt-3">
+                {sliderMarks.map((mark) => (
+                  <span key={mark} className="text-[10px] text-white/30">{mark}</span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Notifications & Feedback */}
-        <div className="mb-8">
-          <h2 className="text-base font-black mb-6">Notifications & Feedback</h2>
+        <div className="mb-6">
+          <h2 className="text-base font-bold mb-4">Notifications & Feedback</h2>
           
-          <div className="space-y-1">
-            <div className="flex items-center justify-between py-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
-                <Volume2 className="w-5 h-5 text-white/60" />
-                <span className="font-medium">Sound Effects</span>
+                <Volume2 className="w-5 h-5 text-white/50" />
+                <span className="font-medium text-sm">Sound Effects</span>
               </div>
-              <button
-                onClick={() => updateWorkout({ soundEffects: !workout.soundEffects })}
-                className={cn(
-                  "w-12 h-7 rounded-full transition-colors border-none relative",
-                  workout.soundEffects ? "bg-[#54f085]" : "bg-white/20"
-                )}
-              >
-                <div className={cn(
-                  "w-5 h-5 bg-white rounded-full absolute top-1 transition-all",
-                  workout.soundEffects ? "right-1" : "left-1"
-                )} />
-              </button>
+              <ToggleSwitch 
+                enabled={workout.soundEffects} 
+                onChange={() => updateWorkout({ soundEffects: !workout.soundEffects })} 
+              />
             </div>
 
-            <div className="flex items-center justify-between py-4">
+            <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
-                <Smartphone className="w-5 h-5 text-white/60" />
-                <span className="font-medium">Vibration</span>
+                <Smartphone className="w-5 h-5 text-white/50" />
+                <span className="font-medium text-sm">Vibration</span>
               </div>
-              <button
-                onClick={() => updateWorkout({ vibration: !workout.vibration })}
-                className={cn(
-                  "w-12 h-7 rounded-full transition-colors border-none relative",
-                  workout.vibration ? "bg-[#54f085]" : "bg-white/20"
-                )}
-              >
-                <div className={cn(
-                  "w-5 h-5 bg-white rounded-full absolute top-1 transition-all",
-                  workout.vibration ? "right-1" : "left-1"
-                )} />
-              </button>
+              <ToggleSwitch 
+                enabled={workout.vibration} 
+                onChange={() => updateWorkout({ vibration: !workout.vibration })} 
+              />
             </div>
 
-            <div className="flex items-center justify-between py-4">
+            <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
-                <Zap className="w-5 h-5 text-white/60" />
-                <span className="font-medium">Visual Flash</span>
+                <Zap className="w-5 h-5 text-white/50" />
+                <span className="font-medium text-sm">Visual Flash</span>
               </div>
-              <button
-                onClick={() => updateWorkout({ visualFlash: !workout.visualFlash })}
-                className={cn(
-                  "w-12 h-7 rounded-full transition-colors border-none relative",
-                  workout.visualFlash ? "bg-[#54f085]" : "bg-white/20"
-                )}
-              >
-                <div className={cn(
-                  "w-5 h-5 bg-white rounded-full absolute top-1 transition-all",
-                  workout.visualFlash ? "right-1" : "left-1"
-                )} />
-              </button>
+              <ToggleSwitch 
+                enabled={workout.visualFlash} 
+                onChange={() => updateWorkout({ visualFlash: !workout.visualFlash })} 
+              />
             </div>
           </div>
         </div>
 
         {/* Advanced */}
         <div className="mb-8">
-          <h2 className="text-base font-black mb-6">Advanced</h2>
+          <h2 className="text-base font-bold mb-4">Advanced</h2>
           
-          <div className="space-y-1">
-            <div className="flex items-center justify-between py-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
-                <Timer className="w-5 h-5 text-white/60" />
-                <span className="font-medium">Preparation Time</span>
+                <Timer className="w-5 h-5 text-white/50" />
+                <span className="font-medium text-sm">Preparation Time</span>
               </div>
               <button
                 onClick={() => {
@@ -264,16 +361,16 @@ export default function Settings() {
                   const nextIndex = (currentIndex + 1) % times.length;
                   updateWorkout({ preparationTime: times[nextIndex] });
                 }}
-                className="text-white/60 font-medium bg-transparent border-none"
+                className="text-white/70 font-medium bg-transparent border-none"
               >
                 {workout.preparationTime}s
               </button>
             </div>
 
-            <div className="flex items-center justify-between py-4">
+            <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
-                <Bell className="w-5 h-5 text-white/60" />
-                <span className="font-medium">Warning Signal</span>
+                <Bell className="w-5 h-5 text-white/50" />
+                <span className="font-medium text-sm">Warning Signal</span>
               </div>
               <button
                 onClick={() => {
@@ -282,7 +379,7 @@ export default function Settings() {
                   const nextIndex = (currentIndex + 1) % times.length;
                   updateWorkout({ warningSignal: times[nextIndex] });
                 }}
-                className="text-white/60 font-medium bg-transparent border-none"
+                className="text-white/70 font-medium bg-transparent border-none"
               >
                 {workout.warningSignal}s before end
               </button>
@@ -291,12 +388,14 @@ export default function Settings() {
         </div>
 
         {/* Save Button */}
-        <button 
-          onClick={handleSave}
-          className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-5 rounded-[20px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none shadow-[0_4px_25px_rgba(84,240,133,0.25)] mt-auto mb-4"
-        >
-          <span className="text-[14px] tracking-[0.2em]">Start Workout</span>
-        </button>
+        <div className="mt-auto sticky bottom-0 bg-[#0d1410] py-4">
+          <button 
+            onClick={handleSave}
+            className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-4 rounded-2xl flex items-center justify-center transition-all active:scale-[0.98] border-none shadow-[0_4px_25px_rgba(84,240,133,0.25)]"
+          >
+            <span className="text-sm tracking-[0.15em]">Start Workout</span>
+          </button>
+        </div>
       </div>
     </div>
   );
