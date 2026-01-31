@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { Box, Flex, Text, Button, Heading, Input, Icon } from '@chakra-ui/react';
-import { MdChevronLeft, MdAccessTime, MdCoffee, MdVolumeUp, MdPhoneIphone, MdFlashOn, MdNotifications, MdHourglassEmpty } from 'react-icons/md';
+import { MdChevronLeft, MdAccessTime, MdCoffee, MdVolumeUp, MdFlashOn, MdNotifications, MdHourglassEmpty } from 'react-icons/md';
 import { currentPageAtom, activeWorkoutAtom, appStateAtom, timeLeftAtom, currentRoundAtom, phaseAtom, totalTimeElapsedAtom, isRunningAtom, editingWorkoutIdAtom } from '../atoms';
 import { WorkoutConfig, DEFAULT_WORKOUT } from '../types';
 import { saveWorkout, generateId, setActiveWorkout, getAppState } from '../storage';
@@ -304,19 +304,6 @@ export default function Settings() {
                 type="checkbox"
                 checked={workout.soundEffects}
                 onChange={() => updateWorkout({ soundEffects: !workout.soundEffects })}
-                style={{ width: '20px', height: '20px', accentColor: '#54f085' }}
-              />
-            </Flex>
-
-            <Flex w="full" justify="space-between" align="center" py={3}>
-              <Flex align="center" gap={4}>
-                <Icon as={MdPhoneIphone} color="whiteAlpha.600" boxSize={5} />
-                <Text fontWeight="medium">Vibration</Text>
-              </Flex>
-              <input
-                type="checkbox"
-                checked={workout.vibration}
-                onChange={() => updateWorkout({ vibration: !workout.vibration })}
                 style={{ width: '20px', height: '20px', accentColor: '#54f085' }}
               />
             </Flex>
