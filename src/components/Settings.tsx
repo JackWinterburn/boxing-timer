@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { ChevronLeft, Clock, Coffee, Volume2, Smartphone, Zap, Timer, Bell } from 'lucide-react';
-import { currentPageAtom, activeWorkoutAtom, appStateAtom, timeLeftAtom, currentRoundAtom, phaseAtom, totalTimeElapsedAtom, isRunningAtom } from '../atoms';
+import { ChevronLeft, Clock, Coffee, Volume2, Smartphone, Zap, Bell, Hourglass } from 'lucide-react';
+import { currentPageAtom, activeWorkoutAtom, appStateAtom, timeLeftAtom, currentRoundAtom, phaseAtom, totalTimeElapsedAtom, isRunningAtom, editingWorkoutIdAtom } from '../atoms';
 import { WorkoutConfig, DEFAULT_WORKOUT } from '../types';
-import { saveWorkout, generateId, saveAppState, setActiveWorkout } from '../storage';
+import { saveWorkout, generateId, setActiveWorkout, getAppState } from '../storage';
 
 export default function Settings() {
   const [, setCurrentPage] = useAtom(currentPageAtom);
@@ -14,20 +14,30 @@ export default function Settings() {
   const [, setPhase] = useAtom(phaseAtom);
   const [, setTotalTimeElapsed] = useAtom(totalTimeElapsedAtom);
   const [, setIsRunning] = useAtom(isRunningAtom);
+  const [editingWorkoutId, setEditingWorkoutId] = useAtom(editingWorkoutIdAtom);
   
   const [workout, setWorkout] = useState<WorkoutConfig>({ ...activeWorkout });
+  const [isNewWorkout, setIsNewWorkout] = useState(false);
 
   useEffect(() => {
-    if (activeWorkout.id === 'new') {
+    if (editingWorkoutId === 'new') {
+      setIsNewWorkout(true);
       setWorkout({
         ...DEFAULT_WORKOUT,
         id: generateId(),
         name: '',
       });
+    } else if (editingWorkoutId) {
+      const existingWorkout = appState.workouts.find(w => w.id === editingWorkoutId);
+      if (existingWorkout) {
+        setWorkout({ ...existingWorkout });
+        setIsNewWorkout(false);
+      }
     } else {
       setWorkout({ ...activeWorkout });
+      setIsNewWorkout(false);
     }
-  }, [activeWorkout]);
+  }, [editingWorkoutId, activeWorkout, appState.workouts]);
 
   const handleSave = () => {
     const workoutToSave = {
@@ -38,27 +48,28 @@ export default function Settings() {
     saveWorkout(workoutToSave);
     setActiveWorkout(workoutToSave.id);
     
-    const updatedState = {
-      ...appState,
-      workouts: appState.workouts.some(w => w.id === workoutToSave.id)
-        ? appState.workouts.map(w => w.id === workoutToSave.id ? workoutToSave : w)
-        : [...appState.workouts, workoutToSave],
-      activeWorkoutId: workoutToSave.id,
-    };
-    setAppState(updatedState);
-    saveAppState(updatedState);
+    const freshState = getAppState();
+    setAppState(freshState);
     
     setActiveWorkout_(workoutToSave);
-    setTimeLeft(workoutToSave.roundDuration);
+    
+    if (workoutToSave.preparationTime > 0) {
+      setPhase('prep');
+      setTimeLeft(workoutToSave.preparationTime);
+    } else {
+      setPhase('work');
+      setTimeLeft(workoutToSave.roundDuration);
+    }
     setCurrentRound(1);
-    setPhase('work');
     setTotalTimeElapsed(0);
     setIsRunning(false);
     
+    setEditingWorkoutId(null);
     setCurrentPage('timer');
   };
 
   const handleBack = () => {
+    setEditingWorkoutId(null);
     setCurrentPage('timer');
   };
 
@@ -86,6 +97,13 @@ export default function Settings() {
     updateWorkout({ restDuration: options[nextIndex] });
   };
 
+  const cyclePrepTime = () => {
+    const options = [0, 5, 10, 15, 30];
+    const currentIndex = options.indexOf(workout.preparationTime);
+    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % options.length;
+    updateWorkout({ preparationTime: options[nextIndex] });
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#0d1410] text-white font-sans">
       <div className="flex-1 flex flex-col max-w-md mx-auto w-full px-5 pb-6 shadow-2xl">
@@ -97,7 +115,9 @@ export default function Settings() {
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-base font-bold">Custom Workout Settings</h1>
+          <h1 className="text-base font-bold">
+            {isNewWorkout ? 'New Workout' : 'Edit Workout'}
+          </h1>
         </header>
 
         {/* Workout Name */}
@@ -118,6 +138,25 @@ export default function Settings() {
         <div className="mb-8">
           <h2 className="text-lg font-bold mb-5">Workout Parameters</h2>
           
+          {/* Prep Time */}
+          <button 
+            onClick={cyclePrepTime}
+            className="w-full flex items-center justify-between py-4 border-b border-white/10 bg-transparent border-x-0 border-t-0"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-yellow-400/15 rounded-xl flex items-center justify-center">
+                <Hourglass className="w-5 h-5 text-yellow-400" />
+              </div>
+              <div className="text-left">
+                <p className="font-semibold text-base">Prep Time</p>
+                <p className="text-xs text-white/50 mt-0.5">Countdown before start</p>
+              </div>
+            </div>
+            <span className="text-yellow-400 font-bold text-lg">
+              {workout.preparationTime === 0 ? 'Off' : `${workout.preparationTime}s`}
+            </span>
+          </button>
+
           {/* Round Duration */}
           <button 
             onClick={cycleRoundDuration}
@@ -141,12 +180,12 @@ export default function Settings() {
             className="w-full flex items-center justify-between py-4 border-b border-white/10 bg-transparent border-x-0 border-t-0"
           >
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-[#54f085]/15 rounded-xl flex items-center justify-center">
-                <Coffee className="w-5 h-5 text-[#54f085]" />
+              <div className="w-10 h-10 bg-orange-400/15 rounded-xl flex items-center justify-center">
+                <Coffee className="w-5 h-5 text-orange-400" />
               </div>
               <p className="font-semibold text-base">Rest Duration</p>
             </div>
-            <span className="text-[#54f085] font-bold text-lg">{formatTime(workout.restDuration)}</span>
+            <span className="text-orange-400 font-bold text-lg">{formatTime(workout.restDuration)}</span>
           </button>
 
           {/* Total Rounds */}
@@ -246,22 +285,6 @@ export default function Settings() {
           <div className="space-y-1">
             <button
               onClick={() => {
-                const times = [5, 10, 15, 30];
-                const currentIndex = times.indexOf(workout.preparationTime);
-                const nextIndex = (currentIndex + 1) % times.length;
-                updateWorkout({ preparationTime: times[nextIndex] });
-              }}
-              className="w-full flex items-center justify-between py-3 bg-transparent border-none"
-            >
-              <div className="flex items-center gap-4">
-                <Timer className="w-5 h-5 text-white/60" />
-                <span className="font-medium">Preparation Time</span>
-              </div>
-              <span className="text-white/70 font-medium">{workout.preparationTime}s</span>
-            </button>
-
-            <button
-              onClick={() => {
                 const times = [10, 30, 60];
                 const currentIndex = times.indexOf(workout.warningSignal);
                 const nextIndex = (currentIndex + 1) % times.length;
@@ -286,7 +309,7 @@ export default function Settings() {
           onClick={handleSave}
           className="w-full bg-[#54f085] hover:bg-[#4de079] text-[#0d1410] font-black uppercase py-4 rounded-2xl flex items-center justify-center transition-all active:scale-[0.98] border-none shadow-[0_4px_20px_rgba(84,240,133,0.3)] text-sm tracking-widest"
         >
-          Start Workout
+          {isNewWorkout ? 'Create Workout' : 'Save Changes'}
         </button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { Play, Pause, RotateCcw, ChevronDown } from "lucide-react";
+import { Play, RotateCcw, ChevronDown } from "lucide-react";
 import {
   currentRoundAtom,
   timeLeftAtom,
@@ -9,6 +9,7 @@ import {
   totalTimeElapsedAtom,
   currentPageAtom,
   activeWorkoutAtom,
+  editingWorkoutIdAtom,
 } from "./atoms";
 import Settings from "./components/Settings";
 import WorkoutSelector from "./components/WorkoutSelector";
@@ -33,20 +34,27 @@ function TimerPage() {
   const [phase, setPhase] = useAtom(phaseAtom);
   const [totalTimeElapsed, setTotalTimeElapsed] = useAtom(totalTimeElapsedAtom);
   const [, setCurrentPage] = useAtom(currentPageAtom);
+  const [, setEditingWorkoutId] = useAtom(editingWorkoutIdAtom);
 
   const timerRef = useRef<number | null>(null);
 
   const workTime = activeWorkout.roundDuration;
   const restTime = activeWorkout.restDuration;
+  const prepTime = activeWorkout.preparationTime;
   const roundCount = activeWorkout.totalRounds;
 
   useEffect(() => {
     if (isRunning) {
       timerRef.current = window.setInterval(() => {
-        setTotalTimeElapsed((prev) => prev + 1);
+        if (phase !== 'prep') {
+          setTotalTimeElapsed((prev) => prev + 1);
+        }
         setTimeLeft((prev) => {
           if (prev <= 1) {
-            if (phase === "work") {
+            if (phase === "prep") {
+              setPhase("work");
+              return workTime;
+            } else if (phase === "work") {
               setPhase("rest");
               return restTime;
             } else {
@@ -76,6 +84,7 @@ function TimerPage() {
     roundCount,
     workTime,
     restTime,
+    prepTime,
     setTimeLeft,
     setPhase,
     setCurrentRound,
@@ -88,15 +97,44 @@ function TimerPage() {
   const resetTimer = () => {
     setIsRunning(false);
     setCurrentRound(1);
-    setPhase("work");
-    setTimeLeft(workTime);
+    if (prepTime > 0) {
+      setPhase("prep");
+      setTimeLeft(prepTime);
+    } else {
+      setPhase("work");
+      setTimeLeft(workTime);
+    }
     setTotalTimeElapsed(0);
   };
 
-  const progress =
-    phase === "work"
-      ? (1 - timeLeft / workTime) * 100
-      : (1 - timeLeft / restTime) * 100;
+  const getProgress = () => {
+    if (phase === "prep") {
+      return (1 - timeLeft / prepTime) * 100;
+    } else if (phase === "work") {
+      return (1 - timeLeft / workTime) * 100;
+    } else {
+      return (1 - timeLeft / restTime) * 100;
+    }
+  };
+
+  const progress = getProgress();
+
+  const getPhaseColor = () => {
+    if (phase === "prep") return "text-yellow-400";
+    if (phase === "work") return "text-[#54f085]";
+    return "text-orange-400";
+  };
+
+  const getPhaseLabel = () => {
+    if (phase === "prep") return "Get Ready";
+    if (phase === "work") return "Work Phase";
+    return "Rest Phase";
+  };
+
+  const handleEditWorkout = () => {
+    setEditingWorkoutId(activeWorkout.id);
+    setCurrentPage("settings");
+  };
 
   return (
     <div
@@ -114,15 +152,15 @@ function TimerPage() {
         {/* Round Info */}
         <div className="text-center mt-4 shrink-0">
           <h2 className="text-3xl font-black mb-1 tracking-tight">
-            Round {currentRound}/{roundCount}
+            {phase === "prep" ? "Prepare" : `Round ${currentRound}/${roundCount}`}
           </h2>
           <p
             className={cn(
               "text-[10px] font-black tracking-[0.2em] uppercase mb-2",
-              phase === "work" ? "text-[#54f085]" : "text-orange-400",
+              getPhaseColor()
             )}
           >
-            {phase === "work" ? "Work Phase" : "Rest Phase"}
+            {getPhaseLabel()}
           </p>
           <button
             onClick={() => setCurrentPage("workouts")}
@@ -164,9 +202,11 @@ function TimerPage() {
                 strokeLinecap="round"
                 className={cn(
                   "transition-all duration-300",
-                  phase === "work"
+                  phase === "prep"
+                    ? "text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.4)]"
+                    : phase === "work"
                     ? "text-[#54f085] drop-shadow-[0_0_10px_rgba(84,240,133,0.4)]"
-                    : "text-orange-400",
+                    : "text-orange-400"
                 )}
               />
             </svg>
@@ -174,10 +214,12 @@ function TimerPage() {
             <div className="flex flex-col items-center justify-center z-10 w-full">
               <div
                 className={cn(
-                  "text-[9rem] sm:text-[16rem] font-black tracking-[-0.08em] leading-none text-center w-full",
-                  phase === "work"
+                  "text-[9rem] sm:text-[12rem] font-black tracking-[-0.08em] leading-none text-center w-full",
+                  phase === "prep"
+                    ? "text-yellow-400 [text-shadow:0_0_40px_rgba(250,204,21,0.7)]"
+                    : phase === "work"
                     ? "text-[#54f085] [text-shadow:0_0_40px_rgba(84,240,133,0.7)]"
-                    : "text-orange-400",
+                    : "text-orange-400"
                 )}
               >
                 {formatTime(timeLeft)}
@@ -230,19 +272,20 @@ function TimerPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <button
-              onClick={() => setCurrentPage("settings")}
+              onClick={handleEditWorkout}
               className="flex items-center justify-center gap-3 py-5 bg-transparent hover:bg-white/5 rounded-2xl font-black uppercase text-sm tracking-[0.2em] transition-colors border-2 border-[#1f2923] text-white"
             >
               <div className="flex gap-1">
                 <div className="w-1.5 h-5 bg-current rounded-sm"></div>
                 <div className="w-1.5 h-5 bg-current rounded-sm"></div>
               </div>
-              SETTINGS
+              EDIT
             </button>
             <button
               onClick={resetTimer}
               className="flex items-center justify-center gap-3 py-5 bg-transparent hover:bg-white/5 rounded-2xl font-black uppercase text-sm tracking-[0.2em] transition-colors border-2 border-[#1f2923] text-white"
             >
+              <RotateCcw className="w-5 h-5 stroke-[3]" />
               RESET
             </button>
           </div>

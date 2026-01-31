@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
-import { ChevronLeft, Plus, Trash2, Check } from 'lucide-react';
-import { currentPageAtom, activeWorkoutAtom, appStateAtom, timeLeftAtom, currentRoundAtom, phaseAtom, totalTimeElapsedAtom, isRunningAtom } from '../atoms';
+import { ChevronLeft, Plus, Trash2, Check, Edit2 } from 'lucide-react';
+import { currentPageAtom, activeWorkoutAtom, appStateAtom, timeLeftAtom, currentRoundAtom, phaseAtom, totalTimeElapsedAtom, isRunningAtom, editingWorkoutIdAtom } from '../atoms';
 import { deleteWorkout, setActiveWorkout, saveAppState, getAppState } from '../storage';
 import { WorkoutConfig } from '../types';
 import { clsx, type ClassValue } from 'clsx';
@@ -25,6 +25,7 @@ export default function WorkoutSelector() {
   const [, setPhase] = useAtom(phaseAtom);
   const [, setTotalTimeElapsed] = useAtom(totalTimeElapsedAtom);
   const [, setIsRunning] = useAtom(isRunningAtom);
+  const [, setEditingWorkoutId] = useAtom(editingWorkoutIdAtom);
 
   const handleBack = () => {
     setCurrentPage('timer');
@@ -38,13 +39,24 @@ export default function WorkoutSelector() {
     setAppState_(updatedState);
     saveAppState(updatedState);
     
-    setTimeLeft(workout.roundDuration);
+    if (workout.preparationTime > 0) {
+      setPhase('prep');
+      setTimeLeft(workout.preparationTime);
+    } else {
+      setPhase('work');
+      setTimeLeft(workout.roundDuration);
+    }
     setCurrentRound(1);
-    setPhase('work');
     setTotalTimeElapsed(0);
     setIsRunning(false);
     
     setCurrentPage('timer');
+  };
+
+  const handleEditWorkout = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingWorkoutId(id);
+    setCurrentPage('settings');
   };
 
   const handleDeleteWorkout = (id: string, e: React.MouseEvent) => {
@@ -58,12 +70,18 @@ export default function WorkoutSelector() {
     if (activeWorkout.id === id) {
       const defaultWorkout = newState.workouts.find(w => w.id === 'default') || newState.workouts[0];
       setActiveWorkout_(defaultWorkout);
-      setTimeLeft(defaultWorkout.roundDuration);
+      if (defaultWorkout.preparationTime > 0) {
+        setPhase('prep');
+        setTimeLeft(defaultWorkout.preparationTime);
+      } else {
+        setPhase('work');
+        setTimeLeft(defaultWorkout.roundDuration);
+      }
     }
   };
 
   const handleCreateNew = () => {
-    setActiveWorkout_({ ...activeWorkout, id: 'new' } as WorkoutConfig);
+    setEditingWorkoutId('new');
     setCurrentPage('settings');
   };
 
@@ -104,16 +122,25 @@ export default function WorkoutSelector() {
                   </div>
                   <p className="text-sm text-white/50">
                     {workout.totalRounds} rounds • {formatDuration(workout.roundDuration)} work • {formatDuration(workout.restDuration)} rest
+                    {workout.preparationTime > 0 && ` • ${workout.preparationTime}s prep`}
                   </p>
                 </div>
-                {workout.id !== 'default' && (
+                <div className="flex items-center gap-1">
                   <button
-                    onClick={(e) => handleDeleteWorkout(workout.id, e)}
-                    className="p-2 hover:bg-red-500/20 rounded-full transition-colors border-none bg-transparent ml-2"
+                    onClick={(e) => handleEditWorkout(workout.id, e)}
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors border-none bg-transparent"
                   >
-                    <Trash2 className="w-4 h-4 text-red-400" />
+                    <Edit2 className="w-4 h-4 text-white/60" />
                   </button>
-                )}
+                  {workout.id !== 'default' && (
+                    <button
+                      onClick={(e) => handleDeleteWorkout(workout.id, e)}
+                      className="p-2 hover:bg-red-500/20 rounded-full transition-colors border-none bg-transparent"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-400" />
+                    </button>
+                  )}
+                </div>
               </div>
             </button>
           ))}
