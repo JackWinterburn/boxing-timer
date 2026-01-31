@@ -1,6 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#0d1410"/>
-  <circle cx="16" cy="16" r="11" fill="none" stroke="#54f085" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="52 17"/>
-  <circle cx="16" cy="16" r="6" fill="#54f085"/>
-  <rect x="14.5" y="10" width="3" height="8" rx="1.5" fill="#0d1410"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="#0d1410"/>
+
+  <!-- Top button / bell -->
+  <rect x="28" y="8" width="8" height="6" rx="2" fill="#54f085"/>
+
+  <!-- Timer body -->
+  <circle cx="32" cy="36" r="18" fill="#54f085"/>
+
+  <!-- Inner face -->
+  <circle cx="32" cy="36" r="14" fill="#0d1410"/>
+
+  <!-- Timer hand -->
+  <line
+    x1="32"
+    y1="36"
+    x2="32"
+    y2="24"
+    stroke="#54f085"
+    stroke-width="3"
+    stroke-linecap="round"
+  />
+
+  <!-- Center dot -->
+  <circle cx="32" cy="36" r="2" fill="#54f085"/>
 </svg>
