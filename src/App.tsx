@@ -51,17 +51,16 @@ function TimerPage() {
               setPhase("work");
               return workTime;
             } else if (phase === "work") {
-              setPhase("rest");
-              return restTime;
-            } else {
-              if (currentRound < roundCount) {
-                setCurrentRound((prev) => prev + 1);
-                setPhase("work");
-                return workTime;
-              } else {
+              if (currentRound >= roundCount) {
                 setIsRunning(false);
                 return 0;
               }
+              setPhase("rest");
+              return restTime;
+            } else {
+              setCurrentRound((prev) => prev + 1);
+              setPhase("work");
+              return workTime;
             }
           }
           return prev - 1;
