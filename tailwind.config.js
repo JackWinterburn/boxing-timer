@@ -8,14 +8,22 @@ export default {
     extend: {
       colors: {
         boxing: {
-          green: '#4ade80',
-          dark: '#0a0a0a',
-          card: '#1a1a1a',
+          primary: '#54f085',
+          bg: '#0d1410',
+          card: '#161e19',
+          border: '#1f2923',
+          text: {
+            muted: '#7d8a82',
+            dim: '#4a5750'
+          }
         }
       },
-      boxShadow: {
-        'neon': '0 0 15px rgba(74, 222, 128, 0.5)',
-        'neon-strong': '0 0 25px rgba(74, 222, 128, 0.7)',
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      dropShadow: {
+        'glow': '0 0 15px rgba(84, 240, 133, 0.4)',
+        'glow-strong': '0 0 25px rgba(84, 240, 133, 0.6)',
       }
     },
   },

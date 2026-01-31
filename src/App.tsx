@@ -85,135 +85,139 @@ export default function App() {
   const strokeDashoffset = circum - (progress / 100) * circum;
 
   return (
-    <div className="flex flex-col min-h-screen bg-boxing-dark text-white font-sans selection:bg-boxing-green/30 w-full max-w-[450px] mx-auto overflow-x-hidden">
-      {/* Header */}
-      <header className="flex items-center justify-between p-4 mb-4">
-        <button className="p-2 hover:bg-white/10 rounded-full transition-colors border-none bg-transparent">
-          <ChevronLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-sm font-bold tracking-[0.2em] uppercase m-0">Boxing Timer</h1>
-        <div className="w-10" />
-      </header>
+    <div className="flex flex-col h-screen bg-boxing-bg text-white font-sans selection:bg-boxing-primary/30 p-4 pb-8 safe-area-inset">
+      <div className="flex-1 flex flex-col max-w-md mx-auto w-full">
+        {/* Header */}
+        <header className="flex items-center justify-between py-4">
+          <button className="p-2 hover:bg-white/5 rounded-full transition-colors border-none bg-transparent">
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-[11px] font-black tracking-[0.4em] uppercase text-white/90">Boxing Timer</h1>
+          <div className="w-10" />
+        </header>
 
-      {/* Round Info */}
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold mb-1">Round {currentRound}/{roundCount}</h2>
-        <p className={cn(
-          "text-xs font-bold tracking-widest uppercase",
-          phase === 'work' ? "text-boxing-green" : "text-orange-400"
-        )}>
-          {phase === 'work' ? 'Work Phase' : 'Rest Phase'}
-        </p>
-      </div>
-
-      {/* Main Timer Display */}
-      <div className="relative flex justify-center items-center mb-12">
-        <svg className="w-64 h-64 -rotate-90">
-          {/* Background Circle */}
-          <circle
-            cx="128"
-            cy="128"
-            r="90"
-            fill="none"
-            stroke="rgba(255,255,255,0.05)"
-            strokeWidth="4"
-          />
-          {/* Progress Circle */}
-          <circle
-            cx="128"
-            cy="128"
-            r="90"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="6"
-            strokeDasharray={circum}
-            strokeDashoffset={strokeDashoffset}
-            strokeLinecap="round"
-            className={cn(
-              "transition-all duration-300",
-              phase === 'work' ? "text-boxing-green drop-shadow-[0_0_15px_rgba(74,222,128,0.5)]" : "text-orange-400"
-            )}
-          />
-        </svg>
-        
-        <div className="absolute inset-0 flex flex-col items-center justify-center pt-4">
-          <div className={cn(
-            "text-7xl font-black tracking-tighter mb-1",
-            phase === 'work' ? "text-boxing-green drop-shadow-[0_0_25px_rgba(74,222,128,0.7)]" : "text-orange-400"
+        {/* Round Info */}
+        <div className="text-center mt-4">
+          <h2 className="text-3xl font-black mb-1 tracking-tight">Round {currentRound}/{roundCount}</h2>
+          <p className={cn(
+            "text-[10px] font-black tracking-[0.2em] uppercase",
+            phase === 'work' ? "text-boxing-primary" : "text-orange-400"
           )}>
-            {formatTime(timeLeft)}
-          </div>
-          <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest text-white/40">
-            <span>Minutes</span>
-            <span>Seconds</span>
-          </div>
+            {phase === 'work' ? 'Work Phase' : 'Rest Phase'}
+          </p>
         </div>
-      </div>
 
-      {/* Progress Bar */}
-      <div className="px-4 mb-8">
-        <div className="flex justify-between items-end mb-2">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">Round Progress</span>
-          <span className="text-[10px] font-bold text-boxing-green">{Math.round(progress)}%</span>
+        {/* Main Timer Display */}
+        <div className="flex-1 flex flex-col items-center justify-center min-h-0 py-8">
+          <div className="relative w-[80vw] max-w-[320px] aspect-square flex items-center justify-center">
+            <svg className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-[0_0_20px_rgba(84,240,133,0.1)]">
+              {/* Background Circle */}
+              <circle
+                cx="50%"
+                cy="50%"
+                r="45%"
+                fill="none"
+                stroke="rgba(255,255,255,0.05)"
+                strokeWidth="1.5"
+              />
+              {/* Progress Circle */}
+              <circle
+                cx="50%"
+                cy="50%"
+                r="45%"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeDasharray="283%"
+                strokeDashoffset={`${283 - (progress * 2.83)}%`}
+                strokeLinecap="round"
+                className={cn(
+                  "transition-all duration-300",
+                  phase === 'work' ? "text-boxing-primary drop-shadow-glow" : "text-orange-400"
+                )}
+              />
+            </svg>
+            
+            <div className="flex flex-col items-center justify-center">
+              <div className={cn(
+                "text-[25vw] sm:text-[100px] font-black tracking-[-0.05em] leading-none mb-4",
+                phase === 'work' ? "text-boxing-primary text-glow" : "text-orange-400"
+              )}>
+                {formatTime(timeLeft)}
+              </div>
+              <div className="flex gap-12 text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
+                <span>Minutes</span>
+                <span>Seconds</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-          <div 
-            className={cn(
-              "h-full transition-all duration-300 rounded-full",
-              phase === 'work' ? "bg-boxing-green" : "bg-orange-400"
+
+        {/* Progress Bar Area */}
+        <div className="mb-8 space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">Round Progress</span>
+            <span className="text-[10px] font-black text-boxing-primary">{Math.round(progress)}%</span>
+          </div>
+          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+            <div 
+              className={cn(
+                "h-full transition-all duration-300 rounded-full",
+                phase === 'work' ? "bg-boxing-primary" : "bg-orange-400"
+              )}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-10">
+          <div className="bg-boxing-card border border-boxing-border rounded-[20px] p-5 text-center flex flex-col justify-center items-center">
+            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20 mb-2">Rest</span>
+            <span className="text-xl font-black tabular-nums">{formatTime(restTime)}</span>
+          </div>
+          <div className="bg-boxing-card border border-boxing-border rounded-[20px] p-5 text-center flex flex-col justify-center items-center">
+            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20 mb-2">Total</span>
+            <span className="text-xl font-black tabular-nums">{formatTime(totalTimeElapsed)}</span>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="space-y-3 mt-auto">
+          <button 
+            onClick={toggleTimer}
+            className="w-full bg-boxing-primary hover:bg-boxing-primary/90 text-boxing-bg font-black uppercase py-5 rounded-[20px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none shadow-[0_4px_20px_rgba(84,240,133,0.3)]"
+          >
+            {isRunning ? (
+              <>
+                <Pause className="w-5 h-5 fill-current" />
+                <span className="text-[13px] tracking-[0.1em]">Pause</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-5 h-5 fill-current ml-1" />
+                <span className="text-[13px] tracking-[0.1em]">Start</span>
+              </>
             )}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-4 px-4 mb-10">
-        <div className="bg-boxing-card/50 border border-white/5 rounded-2xl p-4 text-center">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 block mb-2">Rest</span>
-          <span className="text-xl font-bold">{formatTime(restTime)}</span>
-        </div>
-        <div className="bg-boxing-card/50 border border-white/5 rounded-2xl p-4 text-center">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 block mb-2">Total</span>
-          <span className="text-xl font-bold">{formatTime(totalTimeElapsed)}</span>
-        </div>
-      </div>
-
-      {/* Controls */}
-      <div className="px-4 mt-auto space-y-4 pb-8">
-        <button 
-          onClick={toggleTimer}
-          className="w-full bg-boxing-green hover:bg-boxing-green/90 text-boxing-dark font-black uppercase py-4 rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none"
-        >
-          {isRunning ? (
-            <>
-              <Pause className="w-5 h-5 fill-current" />
-              <span>Pause</span>
-            </>
-          ) : (
-            <>
-              <Play className="w-5 h-5 fill-current ml-1" />
-              <span>Start</span>
-            </>
-          )}
-        </button>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <button 
-            disabled={!isRunning}
-            onClick={() => setIsRunning(false)}
-            className="flex items-center justify-center gap-2 py-4 bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl font-bold uppercase text-xs transition-colors border-none text-white"
-          >
-            <Pause className="w-4 h-4" />
-            Pause
           </button>
-          <button 
-            onClick={resetTimer}
-            className="flex items-center justify-center gap-2 py-4 bg-white/5 hover:bg-white/10 rounded-2xl font-bold uppercase text-xs transition-colors border-none text-white"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Reset
-          </button>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <button 
+              disabled={!isRunning}
+              onClick={() => setIsRunning(false)}
+              className="flex items-center justify-center gap-2 py-5 bg-boxing-card hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed rounded-[20px] font-black uppercase text-[11px] tracking-[0.1em] transition-colors border border-boxing-border text-white/80"
+            >
+              <Pause className="w-4 h-4 fill-current" />
+              Pause
+            </button>
+            <button 
+              onClick={resetTimer}
+              className="flex items-center justify-center gap-2 py-5 bg-boxing-card hover:bg-white/5 rounded-[20px] font-black uppercase text-[11px] tracking-[0.1em] transition-colors border border-boxing-border text-white/80"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Reset
+            </button>
+          </div>
         </div>
       </div>
     </div>
