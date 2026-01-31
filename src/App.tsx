@@ -86,7 +86,7 @@ function TimerPage() {
     : (1 - timeLeft / restTime) * 100;
 
   return (
-    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 p-4 pb-8 safe-area-inset overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 px-4 pt-2 pb-4 safe-area-inset overflow-hidden">
       <div className="flex-1 flex flex-col max-w-md mx-auto w-full overflow-hidden">
         {/* Header */}
         <header className="flex items-center justify-between py-4">
@@ -158,7 +158,7 @@ function TimerPage() {
         </div>
 
         {/* Progress Bar Area */}
-        <div className="mb-6 space-y-3 shrink-0">
+        <div className="mb-4 space-y-2 shrink-0">
           <div className="flex justify-between items-center">
             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">Round Progress</span>
             <span className="text-[10px] font-black text-[#54f085]">{Math.round(progress)}%</span>
@@ -175,47 +175,47 @@ function TimerPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-8 shrink-0">
-          <div className="bg-[#161e19] border border-[#1f2923] rounded-[20px] p-4 text-center flex flex-col justify-center items-center">
+        <div className="grid grid-cols-2 gap-3 mb-4 shrink-0">
+          <div className="bg-[#161e19] border border-[#1f2923] rounded-2xl p-3 text-center flex flex-col justify-center items-center">
             <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Rest</span>
-            <span className="text-xl font-black tabular-nums">{formatTime(restTime)}</span>
+            <span className="text-lg font-black tabular-nums">{formatTime(restTime)}</span>
           </div>
-          <div className="bg-[#161e19] border border-[#1f2923] rounded-[20px] p-4 text-center flex flex-col justify-center items-center">
+          <div className="bg-[#161e19] border border-[#1f2923] rounded-2xl p-3 text-center flex flex-col justify-center items-center">
             <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Total</span>
-            <span className="text-xl font-black tabular-nums">{formatTime(totalTimeElapsed)}</span>
+            <span className="text-lg font-black tabular-nums">{formatTime(totalTimeElapsed)}</span>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="space-y-4 mt-auto mb-6 shrink-0">
+        <div className="space-y-3 shrink-0 pb-2">
           <button 
             onClick={toggleTimer}
-            className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-5 rounded-[20px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none shadow-[0_4px_25px_rgba(84,240,133,0.25)]"
+            className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-4 rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none shadow-[0_4px_25px_rgba(84,240,133,0.25)]"
           >
             {isRunning ? (
               <>
                 <Pause className="w-5 h-5 fill-current" />
-                <span className="text-[14px] tracking-[0.2em]">Pause</span>
+                <span className="text-sm tracking-[0.2em]">Pause</span>
               </>
             ) : (
               <>
                 <Play className="w-5 h-5 fill-current ml-1" />
-                <span className="text-[14px] tracking-[0.2em]">Start</span>
+                <span className="text-sm tracking-[0.2em]">Start</span>
               </>
             )}
           </button>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <button 
               onClick={() => setCurrentPage('settings')}
-              className="flex items-center justify-center gap-2 py-4 bg-[#161e19] hover:bg-white/5 rounded-[20px] font-black uppercase text-[11px] tracking-[0.2em] transition-colors border border-[#1f2923] text-white/90"
+              className="flex items-center justify-center gap-2 py-3 bg-[#161e19] hover:bg-white/5 rounded-2xl font-black uppercase text-[11px] tracking-[0.15em] transition-colors border border-[#1f2923] text-white/90"
             >
               <SettingsIcon className="w-4 h-4" />
               Settings
             </button>
             <button 
               onClick={resetTimer}
-              className="flex items-center justify-center gap-2 py-4 bg-[#161e19] hover:bg-white/5 rounded-[20px] font-black uppercase text-[11px] tracking-[0.2em] transition-colors border border-[#1f2923] text-white/90"
+              className="flex items-center justify-center gap-2 py-3 bg-[#161e19] hover:bg-white/5 rounded-2xl font-black uppercase text-[11px] tracking-[0.15em] transition-colors border border-[#1f2923] text-white/90"
             >
               <RotateCcw className="w-4 h-4" />
               Reset

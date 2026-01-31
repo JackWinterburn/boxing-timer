@@ -1,90 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { ChevronLeft, ChevronRight, Clock, Coffee, Volume2, Smartphone, Zap, Timer, Bell } from 'lucide-react';
+import { ChevronLeft, Clock, Coffee, Volume2, Smartphone, Zap, Timer, Bell } from 'lucide-react';
 import { currentPageAtom, activeWorkoutAtom, appStateAtom, timeLeftAtom, currentRoundAtom, phaseAtom, totalTimeElapsedAtom, isRunningAtom } from '../atoms';
 import { WorkoutConfig, DEFAULT_WORKOUT } from '../types';
 import { saveWorkout, generateId, saveAppState, setActiveWorkout } from '../storage';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-interface ScrollPickerProps {
-  value: number;
-  min: number;
-  max: number;
-  onChange: (value: number) => void;
-  padZero?: boolean;
-}
-
-function ScrollPicker({ value, min, max, onChange, padZero = true }: ScrollPickerProps) {
-  const values = Array.from({ length: max - min + 1 }, (_, i) => min + i);
-  const currentIndex = values.indexOf(value);
-  
-  const prevValue = currentIndex > 0 ? values[currentIndex - 1] : null;
-  const nextValue = currentIndex < values.length - 1 ? values[currentIndex + 1] : null;
-  
-  const format = (v: number | null) => {
-    if (v === null) return '';
-    return padZero ? v.toString().padStart(2, '0') : v.toString();
-  };
-
-  const handleUp = () => {
-    if (currentIndex > 0) {
-      onChange(values[currentIndex - 1]);
-    }
-  };
-
-  const handleDown = () => {
-    if (currentIndex < values.length - 1) {
-      onChange(values[currentIndex + 1]);
-    }
-  };
-
-  return (
-    <div className="flex flex-col items-center w-20">
-      <button 
-        onClick={handleUp}
-        className="text-white/30 text-lg font-medium h-8 bg-transparent border-none"
-      >
-        {format(prevValue)}
-      </button>
-      <div className="bg-[#1a3a2a] rounded-lg px-4 py-2 my-1">
-        <span className="text-[#54f085] text-2xl font-black">{format(value)}</span>
-      </div>
-      <button 
-        onClick={handleDown}
-        className="text-white/30 text-lg font-medium h-8 bg-transparent border-none"
-      >
-        {format(nextValue)}
-      </button>
-    </div>
-  );
-}
-
-interface ToggleSwitchProps {
-  enabled: boolean;
-  onChange: () => void;
-}
-
-function ToggleSwitch({ enabled, onChange }: ToggleSwitchProps) {
-  return (
-    <button
-      onClick={onChange}
-      className={cn(
-        "w-12 h-7 rounded-full transition-colors border-none relative",
-        enabled ? "bg-[#54f085]" : "bg-white/20"
-      )}
-    >
-      <div className={cn(
-        "w-5 h-5 bg-white rounded-full absolute top-1 transition-all",
-        enabled ? "right-1" : "left-1"
-      )} />
-    </button>
-  );
-}
 
 export default function Settings() {
   const [, setCurrentPage] = useAtom(currentPageAtom);
@@ -97,8 +16,6 @@ export default function Settings() {
   const [, setIsRunning] = useAtom(isRunningAtom);
   
   const [workout, setWorkout] = useState<WorkoutConfig>({ ...activeWorkout });
-  const [showRoundPicker, setShowRoundPicker] = useState(false);
-  const [showRestPicker, setShowRestPicker] = useState(false);
 
   useEffect(() => {
     if (activeWorkout.id === 'new') {
@@ -149,36 +66,43 @@ export default function Settings() {
     setWorkout(prev => ({ ...prev, ...updates }));
   };
 
-  const roundMinutes = Math.floor(workout.roundDuration / 60);
-  const roundSeconds = workout.roundDuration % 60;
-  const restMinutes = Math.floor(workout.restDuration / 60);
-  const restSeconds = workout.restDuration % 60;
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const sliderMarks = [1, 6, 12, 18, 24];
+  const cycleRoundDuration = () => {
+    const options = [60, 90, 120, 180, 240, 300];
+    const currentIndex = options.indexOf(workout.roundDuration);
+    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % options.length;
+    updateWorkout({ roundDuration: options[nextIndex] });
+  };
+
+  const cycleRestDuration = () => {
+    const options = [30, 45, 60, 90, 120];
+    const currentIndex = options.indexOf(workout.restDuration);
+    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % options.length;
+    updateWorkout({ restDuration: options[nextIndex] });
+  };
 
   return (
-    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans overflow-y-auto">
-      <div className="flex-1 flex flex-col max-w-md mx-auto w-full px-4 pb-8">
+    <div className="flex flex-col min-h-screen bg-[#0d1410] text-white font-sans">
+      <div className="flex-1 flex flex-col max-w-md mx-auto w-full px-5 pb-6">
         {/* Header */}
-        <header className="flex items-center gap-3 py-4 sticky top-0 bg-[#0d1410] z-10">
+        <header className="flex items-center gap-3 py-5 sticky top-0 bg-[#0d1410] z-10">
           <button 
             onClick={handleBack}
-            className="p-2 hover:bg-white/5 rounded-full transition-colors border-none bg-transparent"
+            className="p-2 -ml-2 hover:bg-white/5 rounded-full transition-colors border-none bg-transparent"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-sm font-bold">Custom Workout Settings</h1>
+          <h1 className="text-base font-bold">Custom Workout Settings</h1>
         </header>
 
         {/* Workout Name */}
-        <div className="mt-4 mb-6">
-          <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#54f085] block mb-2">
+        <div className="mb-8">
+          <label className="text-xs font-bold uppercase tracking-wider text-[#54f085] block mb-3">
             Workout Name
           </label>
           <input
@@ -186,118 +110,71 @@ export default function Settings() {
             value={workout.name}
             onChange={(e) => updateWorkout({ name: e.target.value })}
             placeholder="e.g., Morning Sparring"
-            className="w-full bg-transparent border-none py-2 text-lg text-white/50 placeholder:text-white/30 focus:outline-none focus:text-white"
+            className="w-full bg-transparent border-b border-white/20 py-3 text-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#54f085] transition-colors"
           />
         </div>
 
         {/* Workout Parameters */}
-        <div className="mb-6">
-          <h2 className="text-base font-bold mb-4">Workout Parameters</h2>
+        <div className="mb-8">
+          <h2 className="text-lg font-bold mb-5">Workout Parameters</h2>
           
           {/* Round Duration */}
-          <div className="mb-4">
-            <button 
-              onClick={() => setShowRoundPicker(!showRoundPicker)}
-              className="w-full flex items-center justify-between py-3 bg-transparent border-none"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#1a3a2a] rounded-lg flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-[#54f085]" />
-                </div>
-                <div className="text-left">
-                  <p className="font-medium text-sm">Round Duration</p>
-                  <p className="text-[10px] text-white/40">Standard training length</p>
-                </div>
+          <button 
+            onClick={cycleRoundDuration}
+            className="w-full flex items-center justify-between py-4 border-b border-white/10 bg-transparent border-x-0 border-t-0"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-[#54f085]/15 rounded-xl flex items-center justify-center">
+                <Clock className="w-5 h-5 text-[#54f085]" />
               </div>
-              <div className="flex items-center gap-1">
-                <span className="text-[#54f085] font-bold">{formatTime(workout.roundDuration)}</span>
-                <ChevronRight className={cn("w-4 h-4 text-white/40 transition-transform", showRoundPicker && "rotate-90")} />
+              <div className="text-left">
+                <p className="font-semibold text-base">Round Duration</p>
+                <p className="text-xs text-white/50 mt-0.5">Standard training length</p>
               </div>
-            </button>
-            
-            {showRoundPicker && (
-              <div className="flex items-center justify-center gap-2 py-4 bg-[#0f1a14] rounded-xl mt-2">
-                <ScrollPicker 
-                  value={roundMinutes} 
-                  min={0} 
-                  max={10} 
-                  onChange={(v) => updateWorkout({ roundDuration: v * 60 + roundSeconds })}
-                />
-                <span className="text-2xl font-bold text-white/50">:</span>
-                <ScrollPicker 
-                  value={roundSeconds} 
-                  min={0} 
-                  max={59} 
-                  onChange={(v) => updateWorkout({ roundDuration: roundMinutes * 60 + v })}
-                />
-              </div>
-            )}
-          </div>
+            </div>
+            <span className="text-[#54f085] font-bold text-lg">{formatTime(workout.roundDuration)}</span>
+          </button>
 
           {/* Rest Duration */}
-          <div className="mb-6">
-            <button 
-              onClick={() => setShowRestPicker(!showRestPicker)}
-              className="w-full flex items-center justify-between py-3 bg-transparent border-none"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#1a3a2a] rounded-lg flex items-center justify-center">
-                  <Coffee className="w-4 h-4 text-[#54f085]" />
-                </div>
-                <p className="font-medium text-sm">Rest Duration</p>
+          <button 
+            onClick={cycleRestDuration}
+            className="w-full flex items-center justify-between py-4 border-b border-white/10 bg-transparent border-x-0 border-t-0"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-[#54f085]/15 rounded-xl flex items-center justify-center">
+                <Coffee className="w-5 h-5 text-[#54f085]" />
               </div>
-              <div className="flex items-center gap-1">
-                <span className="text-[#54f085] font-bold">{formatTime(workout.restDuration)}</span>
-                <ChevronRight className={cn("w-4 h-4 text-white/40 transition-transform", showRestPicker && "rotate-90")} />
-              </div>
-            </button>
-            
-            {showRestPicker && (
-              <div className="flex items-center justify-center gap-2 py-4 bg-[#0f1a14] rounded-xl mt-2">
-                <ScrollPicker 
-                  value={restMinutes} 
-                  min={0} 
-                  max={10} 
-                  onChange={(v) => updateWorkout({ restDuration: v * 60 + restSeconds })}
-                />
-                <span className="text-2xl font-bold text-white/50">:</span>
-                <ScrollPicker 
-                  value={restSeconds} 
-                  min={0} 
-                  max={59} 
-                  onChange={(v) => updateWorkout({ restDuration: restMinutes * 60 + v })}
-                />
-              </div>
-            )}
-          </div>
+              <p className="font-semibold text-base">Rest Duration</p>
+            </div>
+            <span className="text-[#54f085] font-bold text-lg">{formatTime(workout.restDuration)}</span>
+          </button>
 
           {/* Total Rounds */}
-          <div className="mb-2">
+          <div className="pt-6 pb-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/40">Total Rounds</span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#54f085]">Pro Setting</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-white/50">Total Rounds</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#54f085]">Pro Setting</span>
             </div>
-            <div className="flex items-baseline gap-2 mb-4">
-              <span className="text-3xl font-black">{workout.totalRounds}</span>
-              <span className="text-sm text-white/40">rounds</span>
+            <div className="flex items-baseline gap-2 mb-5">
+              <span className="text-4xl font-black">{workout.totalRounds}</span>
+              <span className="text-base text-white/50">rounds</span>
             </div>
             
-            {/* Custom Slider */}
-            <div className="relative pt-2 pb-6">
+            <div className="relative">
               <input
                 type="range"
                 min="1"
                 max="24"
                 value={workout.totalRounds}
                 onChange={(e) => updateWorkout({ totalRounds: parseInt(e.target.value) })}
-                className="w-full h-1 bg-[#1a3a2a] rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-[#54f085] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(84,240,133,0.5)]"
+                className="w-full h-2 rounded-full appearance-none cursor-pointer"
                 style={{
                   background: `linear-gradient(to right, #54f085 0%, #54f085 ${((workout.totalRounds - 1) / 23) * 100}%, #1a3a2a ${((workout.totalRounds - 1) / 23) * 100}%, #1a3a2a 100%)`
                 }}
               />
-              <div className="flex justify-between mt-3">
-                {sliderMarks.map((mark) => (
-                  <span key={mark} className="text-[10px] text-white/30">{mark}</span>
+              <div className="flex justify-between mt-3 px-1">
+                {[1, 6, 12, 18, 24].map((mark) => (
+                  <span key={mark} className="text-xs text-white/40 font-medium">{mark}</span>
                 ))}
               </div>
             </div>
@@ -305,97 +182,112 @@ export default function Settings() {
         </div>
 
         {/* Notifications & Feedback */}
-        <div className="mb-6">
-          <h2 className="text-base font-bold mb-4">Notifications & Feedback</h2>
+        <div className="mb-8">
+          <h2 className="text-lg font-bold mb-5">Notifications & Feedback</h2>
           
-          <div className="space-y-4">
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-3">
-                <Volume2 className="w-5 h-5 text-white/50" />
-                <span className="font-medium text-sm">Sound Effects</span>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between py-3">
+              <div className="flex items-center gap-4">
+                <Volume2 className="w-5 h-5 text-white/60" />
+                <span className="font-medium">Sound Effects</span>
               </div>
-              <ToggleSwitch 
-                enabled={workout.soundEffects} 
-                onChange={() => updateWorkout({ soundEffects: !workout.soundEffects })} 
-              />
+              <button
+                onClick={() => updateWorkout({ soundEffects: !workout.soundEffects })}
+                className="w-14 h-8 rounded-full transition-all duration-200 border-none relative flex items-center px-1"
+                style={{ backgroundColor: workout.soundEffects ? '#54f085' : 'rgba(255,255,255,0.15)' }}
+              >
+                <div 
+                  className="w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200"
+                  style={{ transform: workout.soundEffects ? 'translateX(24px)' : 'translateX(0)' }}
+                />
+              </button>
             </div>
 
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-3">
-                <Smartphone className="w-5 h-5 text-white/50" />
-                <span className="font-medium text-sm">Vibration</span>
+            <div className="flex items-center justify-between py-3">
+              <div className="flex items-center gap-4">
+                <Smartphone className="w-5 h-5 text-white/60" />
+                <span className="font-medium">Vibration</span>
               </div>
-              <ToggleSwitch 
-                enabled={workout.vibration} 
-                onChange={() => updateWorkout({ vibration: !workout.vibration })} 
-              />
+              <button
+                onClick={() => updateWorkout({ vibration: !workout.vibration })}
+                className="w-14 h-8 rounded-full transition-all duration-200 border-none relative flex items-center px-1"
+                style={{ backgroundColor: workout.vibration ? '#54f085' : 'rgba(255,255,255,0.15)' }}
+              >
+                <div 
+                  className="w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200"
+                  style={{ transform: workout.vibration ? 'translateX(24px)' : 'translateX(0)' }}
+                />
+              </button>
             </div>
 
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-3">
-                <Zap className="w-5 h-5 text-white/50" />
-                <span className="font-medium text-sm">Visual Flash</span>
+            <div className="flex items-center justify-between py-3">
+              <div className="flex items-center gap-4">
+                <Zap className="w-5 h-5 text-white/60" />
+                <span className="font-medium">Visual Flash</span>
               </div>
-              <ToggleSwitch 
-                enabled={workout.visualFlash} 
-                onChange={() => updateWorkout({ visualFlash: !workout.visualFlash })} 
-              />
+              <button
+                onClick={() => updateWorkout({ visualFlash: !workout.visualFlash })}
+                className="w-14 h-8 rounded-full transition-all duration-200 border-none relative flex items-center px-1"
+                style={{ backgroundColor: workout.visualFlash ? '#54f085' : 'rgba(255,255,255,0.15)' }}
+              >
+                <div 
+                  className="w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200"
+                  style={{ transform: workout.visualFlash ? 'translateX(24px)' : 'translateX(0)' }}
+                />
+              </button>
             </div>
           </div>
         </div>
 
         {/* Advanced */}
         <div className="mb-8">
-          <h2 className="text-base font-bold mb-4">Advanced</h2>
+          <h2 className="text-lg font-bold mb-5">Advanced</h2>
           
-          <div className="space-y-4">
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-3">
-                <Timer className="w-5 h-5 text-white/50" />
-                <span className="font-medium text-sm">Preparation Time</span>
+          <div className="space-y-1">
+            <button
+              onClick={() => {
+                const times = [5, 10, 15, 30];
+                const currentIndex = times.indexOf(workout.preparationTime);
+                const nextIndex = (currentIndex + 1) % times.length;
+                updateWorkout({ preparationTime: times[nextIndex] });
+              }}
+              className="w-full flex items-center justify-between py-3 bg-transparent border-none"
+            >
+              <div className="flex items-center gap-4">
+                <Timer className="w-5 h-5 text-white/60" />
+                <span className="font-medium">Preparation Time</span>
               </div>
-              <button
-                onClick={() => {
-                  const times = [5, 10, 15, 30];
-                  const currentIndex = times.indexOf(workout.preparationTime);
-                  const nextIndex = (currentIndex + 1) % times.length;
-                  updateWorkout({ preparationTime: times[nextIndex] });
-                }}
-                className="text-white/70 font-medium bg-transparent border-none"
-              >
-                {workout.preparationTime}s
-              </button>
-            </div>
+              <span className="text-white/70 font-medium">{workout.preparationTime}s</span>
+            </button>
 
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-3">
-                <Bell className="w-5 h-5 text-white/50" />
-                <span className="font-medium text-sm">Warning Signal</span>
+            <button
+              onClick={() => {
+                const times = [10, 30, 60];
+                const currentIndex = times.indexOf(workout.warningSignal);
+                const nextIndex = (currentIndex + 1) % times.length;
+                updateWorkout({ warningSignal: times[nextIndex] });
+              }}
+              className="w-full flex items-center justify-between py-3 bg-transparent border-none"
+            >
+              <div className="flex items-center gap-4">
+                <Bell className="w-5 h-5 text-white/60" />
+                <span className="font-medium">Warning Signal</span>
               </div>
-              <button
-                onClick={() => {
-                  const times = [10, 30, 60];
-                  const currentIndex = times.indexOf(workout.warningSignal);
-                  const nextIndex = (currentIndex + 1) % times.length;
-                  updateWorkout({ warningSignal: times[nextIndex] });
-                }}
-                className="text-white/70 font-medium bg-transparent border-none"
-              >
-                {workout.warningSignal}s before end
-              </button>
-            </div>
+              <span className="text-white/70 font-medium">{workout.warningSignal}s before end</span>
+            </button>
           </div>
         </div>
 
+        {/* Spacer */}
+        <div className="flex-1 min-h-4" />
+
         {/* Save Button */}
-        <div className="mt-auto sticky bottom-0 bg-[#0d1410] py-4">
-          <button 
-            onClick={handleSave}
-            className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-4 rounded-2xl flex items-center justify-center transition-all active:scale-[0.98] border-none shadow-[0_4px_25px_rgba(84,240,133,0.25)]"
-          >
-            <span className="text-sm tracking-[0.15em]">Start Workout</span>
-          </button>
-        </div>
+        <button 
+          onClick={handleSave}
+          className="w-full bg-[#54f085] hover:bg-[#4de079] text-[#0d1410] font-black uppercase py-4 rounded-2xl flex items-center justify-center transition-all active:scale-[0.98] border-none shadow-[0_4px_20px_rgba(84,240,133,0.3)] text-sm tracking-widest"
+        >
+          Start Workout
+        </button>
       </div>
     </div>
   );
