@@ -15,7 +15,7 @@ export const restTimeAtom = atom((get) => get(activeWorkoutAtom).restDuration);
 export const prepTimeAtom = atom((get) => get(activeWorkoutAtom).preparationTime);
 export const timeLeftAtom = atom(initialWorkout.preparationTime > 0 ? initialWorkout.preparationTime : initialWorkout.roundDuration);
 export const isRunningAtom = atom(false);
-export const phaseAtom = atom<'prep' | 'work' | 'rest'>(initialWorkout.preparationTime > 0 ? 'prep' : 'work');
+export const phaseAtom = atom<'prep' | 'work' | 'rest' | 'complete'>(initialWorkout.preparationTime > 0 ? 'prep' : 'work');
 export const totalTimeElapsedAtom = atom(0);
 
 export type Page = 'timer' | 'settings' | 'workouts';

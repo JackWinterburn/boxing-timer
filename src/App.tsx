@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
 import { Box, Flex, Text, Button, Heading, Grid, Icon } from "@chakra-ui/react";
-import { FaPlay, FaPause } from "react-icons/fa";
+import { FaPlay, FaPause, FaCheck } from "react-icons/fa";
 import { MdRefresh, MdKeyboardArrowDown, MdEdit } from "react-icons/md";
 import {
   currentRoundAtom,
@@ -96,6 +96,7 @@ function TimerPage() {
             } else if (phase === "work") {
               if (activeWorkout.soundEffects) playWorkEndSound();
               if (currentRound >= roundCount) {
+                setPhase("complete");
                 setIsRunning(false);
                 return 0;
               }
@@ -148,6 +149,7 @@ function TimerPage() {
   };
 
   const getProgress = () => {
+    if (phase === "complete") return 100;
     if (phase === "prep") {
       return (1 - timeLeft / prepTime) * 100;
     } else if (phase === "work") {
@@ -160,12 +162,14 @@ function TimerPage() {
   const progress = getProgress();
 
   const getPhaseColor = () => {
+    if (phase === "complete") return "#54f085";
     if (phase === "prep") return "#facc15";
     if (phase === "work") return "#54f085";
     return "#fb923c";
   };
 
   const getPhaseLabel = () => {
+    if (phase === "complete") return "Workout Complete!";
     if (phase === "prep") return "Get Ready";
     if (phase === "work") return "Work Phase";
     return "Rest Phase";
@@ -206,7 +210,7 @@ function TimerPage() {
         {/* Round Info */}
         <Flex direction="column" align="center" gap={2}>
           <Heading size="lg" fontWeight="black">
-            {phase === "prep" ? "Prepare" : `Round ${currentRound}/${roundCount}`}
+            {phase === "complete" ? "Finished!" : phase === "prep" ? "Prepare" : `Round ${currentRound}/${roundCount}`}
           </Heading>
           <Text
             fontSize="xs"
@@ -276,7 +280,9 @@ function TimerPage() {
               style={{
                 transition: "stroke-dashoffset 0.3s ease",
                 filter:
-                  phase === "prep"
+                  phase === "complete"
+                    ? "drop-shadow(0 0 15px rgba(84,240,133,0.6))"
+                    : phase === "prep"
                     ? "drop-shadow(0 0 10px rgba(250,204,21,0.4))"
                     : phase === "work"
                     ? "drop-shadow(0 0 10px rgba(84,240,133,0.4))"
@@ -285,22 +291,47 @@ function TimerPage() {
             />
           </Box>
 
-          <Text
-            fontSize={{ base: "7xl", sm: "9xl" }}
-            fontWeight="black"
-            letterSpacing="-0.08em"
-            color={getPhaseColor()}
-            textShadow={
-              phase === "prep"
-                ? "0 0 40px rgba(250,204,21,0.7)"
-                : phase === "work"
-                ? "0 0 40px rgba(84,240,133,0.7)"
-                : "none"
-            }
-            zIndex={1}
-          >
-            {formatTime(timeLeft)}
-          </Text>
+          {phase === "complete" ? (
+            <Flex
+              direction="column"
+              align="center"
+              gap={2}
+              zIndex={1}
+            >
+              <Icon
+                as={FaCheck}
+                boxSize={{ base: 16, sm: 20 }}
+                color="#54f085"
+                filter="drop-shadow(0 0 30px rgba(84,240,133,0.8))"
+              />
+              <Text
+                fontSize={{ base: "lg", sm: "xl" }}
+                fontWeight="bold"
+                color="#54f085"
+                textTransform="uppercase"
+                letterSpacing="0.2em"
+              >
+                Done
+              </Text>
+            </Flex>
+          ) : (
+            <Text
+              fontSize={{ base: "7xl", sm: "9xl" }}
+              fontWeight="black"
+              letterSpacing="-0.08em"
+              color={getPhaseColor()}
+              textShadow={
+                phase === "prep"
+                  ? "0 0 40px rgba(250,204,21,0.7)"
+                  : phase === "work"
+                  ? "0 0 40px rgba(84,240,133,0.7)"
+                  : "none"
+              }
+              zIndex={1}
+            >
+              {formatTime(timeLeft)}
+            </Text>
+          )}
         </Box>
 
         {/* Stats Grid */}
