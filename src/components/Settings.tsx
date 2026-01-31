@@ -88,7 +88,7 @@ export default function Settings() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0d1410] text-white font-sans">
-      <div className="flex-1 flex flex-col max-w-md mx-auto w-full px-5 pb-6">
+      <div className="flex-1 flex flex-col max-w-md mx-auto w-full px-5 pb-6 border-x border-white/5 shadow-2xl">
         {/* Header */}
         <header className="flex items-center gap-3 py-5 sticky top-0 bg-[#0d1410] z-10">
           <button 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
-import { ChevronLeft, Play, Pause, RotateCcw, Settings as SettingsIcon, ChevronDown } from 'lucide-react';
+import { ChevronLeft, Play, Pause, RotateCcw, ChevronDown } from 'lucide-react';
 import { 
   currentRoundAtom, 
   timeLeftAtom, 
@@ -86,8 +86,8 @@ function TimerPage() {
     : (1 - timeLeft / restTime) * 100;
 
   return (
-    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 px-4 pt-2 pb-24 safe-area-inset overflow-hidden">
-      <div className="flex-1 flex flex-col max-w-md mx-auto w-full overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 safe-area-inset overflow-hidden">
+      <div className="flex-1 flex flex-col max-w-md mx-auto w-full px-4 pt-2 pb-24 overflow-hidden border-x border-white/5">
         {/* Header */}
         <header className="flex items-center justify-between py-4">
           <button className="p-2 hover:bg-white/5 rounded-full transition-colors border-none bg-transparent">
