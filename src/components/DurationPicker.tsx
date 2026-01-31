@@ -88,7 +88,7 @@ function WheelColumn({
         }}
         onScroll={handleScroll}
       >
-        <Box h={`${ITEM_HEIGHT}px`} />
+        <Box h={`${ITEM_HEIGHT}px`} css={{ scrollSnapAlign: 'start' }} />
         {values.map((val, idx) => (
           <Flex
             key={idx}
