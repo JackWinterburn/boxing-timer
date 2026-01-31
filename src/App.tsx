@@ -244,6 +244,7 @@ function TimerPage() {
           position="relative"
           w="full"
           maxW="280px"
+          mt={4}
           mx="auto"
           aspectRatio={1}
           display="flex"
@@ -336,7 +337,8 @@ function TimerPage() {
         </Box>
 
         {/* Stats Grid */}
-        <Grid templateColumns="repeat(2, 1fr)" gap={3} mb={3}>
+        <div>
+        <Grid templateColumns="repeat(2, 1fr)" gap={3} mb={3} mt={10}>
           <Box
             bg="#161e19"
             borderWidth="1px"
@@ -458,6 +460,7 @@ function TimerPage() {
             </Button>
           </Grid>
         </Flex>
+        </div>
       </Flex>
     </Box>
   );
