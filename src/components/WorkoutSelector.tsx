@@ -69,7 +69,7 @@ export default function WorkoutSelector() {
 
   return (
     <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans overflow-y-auto">
-      <div className="flex-1 flex flex-col max-w-md mx-auto w-full p-4 pb-8 border-x border-white/5 shadow-2xl">
+      <div className="flex-1 flex flex-col max-w-md mx-auto w-full p-4 pb-8 shadow-2xl">
         {/* Header */}
         <header className="flex items-center gap-4 py-4 mb-6">
           <button 

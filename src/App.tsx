@@ -103,7 +103,7 @@ function TimerPage() {
       className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 safe-area-inset overflow-hidden"
       style={{ maxWidth: "480px", margin: "0 auto" }}
     >
-      <div className="flex-1 flex flex-col max-w-md mx-auto w-full px-4 pt-2 pb-24 overflow-hidden border-x border-white/5">
+      <div className="flex-1 flex flex-col max-w-md mx-auto w-full px-4 pt-2 pb-24 overflow-hidden shadow-2xl">
         {/* Header */}
         <header className="flex items-center justify-center py-4 relative">
           <h1 className="text-[11px] font-black tracking-[0.4em] uppercase text-white/90">
