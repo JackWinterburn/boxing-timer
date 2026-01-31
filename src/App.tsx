@@ -22,6 +22,48 @@ const formatTime = (seconds: number) => {
   return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 };
 
+const audioContextRef = { current: null as AudioContext | null };
+
+const getAudioContext = () => {
+  if (!audioContextRef.current) {
+    audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+  }
+  return audioContextRef.current;
+};
+
+const playBeep = (frequency: number, duration: number, volume: number = 0.5) => {
+  try {
+    const ctx = getAudioContext();
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    
+    oscillator.frequency.value = frequency;
+    oscillator.type = "sine";
+    
+    gainNode.gain.setValueAtTime(volume, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+    
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + duration);
+  } catch (e) {
+    console.log("Audio not supported");
+  }
+};
+
+const playWorkStartSound = () => {
+  playBeep(880, 0.15, 0.6);
+  setTimeout(() => playBeep(1100, 0.15, 0.6), 150);
+  setTimeout(() => playBeep(1320, 0.2, 0.7), 300);
+};
+
+const playWorkEndSound = () => {
+  playBeep(660, 0.3, 0.5);
+  setTimeout(() => playBeep(440, 0.4, 0.5), 300);
+};
+
 function TimerPage() {
   const [activeWorkout] = useAtom(activeWorkoutAtom);
   const [currentRound, setCurrentRound] = useAtom(currentRoundAtom);
@@ -48,9 +90,11 @@ function TimerPage() {
         setTimeLeft((prev) => {
           if (prev <= 1) {
             if (phase === "prep") {
+              if (activeWorkout.soundEffects) playWorkStartSound();
               setPhase("work");
               return workTime;
             } else if (phase === "work") {
+              if (activeWorkout.soundEffects) playWorkEndSound();
               if (currentRound >= roundCount) {
                 setIsRunning(false);
                 return 0;
@@ -58,6 +102,7 @@ function TimerPage() {
               setPhase("rest");
               return restTime;
             } else {
+              if (activeWorkout.soundEffects) playWorkStartSound();
               setCurrentRound((prev) => prev + 1);
               setPhase("work");
               return workTime;
