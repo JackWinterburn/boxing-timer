@@ -87,7 +87,14 @@ export default function Settings() {
   };
 
   return (
-    <Box bg="#0d1410" minH="100vh" color="white" px={5} pb={6}>
+    <Box 
+      bg="#0d1410" 
+      minH="100vh" 
+      color="white" 
+      px={5} 
+      pt="calc(env(safe-area-inset-top, 0px) + 8px)"
+      pb="calc(env(safe-area-inset-bottom, 0px) + 24px)"
+    >
       <Flex direction="column" gap={6} maxW="md" mx="auto">
         {/* Header */}
         <Flex align="center" py={5} gap={3}>

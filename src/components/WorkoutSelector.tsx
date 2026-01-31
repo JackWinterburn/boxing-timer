@@ -81,7 +81,15 @@ export default function WorkoutSelector() {
   };
 
   return (
-    <Box bg="#0d1410" minH="100vh" color="white" overflowY="auto" p={4} pb={8}>
+    <Box 
+      bg="#0d1410" 
+      minH="100vh" 
+      color="white" 
+      overflowY="auto" 
+      px={4}
+      pt="calc(env(safe-area-inset-top, 0px) + 16px)"
+      pb="calc(env(safe-area-inset-bottom, 0px) + 32px)"
+    >
       <Flex direction="column" gap={6} maxW="md" mx="auto">
         {/* Header */}
         <Flex align="center" py={4} gap={4}>
