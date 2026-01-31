@@ -177,13 +177,16 @@ function TimerPage() {
           >
             {isRunning ? (
               <>
-                <Pause className="w-6 h-6 fill-current" />
-                <span className="text-lg tracking-[0.2em]">Pause</span>
+                <div className="flex gap-1">
+                  <div className="w-2 h-6 bg-current rounded-sm"></div>
+                  <div className="w-2 h-6 bg-current rounded-sm"></div>
+                </div>
+                <span className="text-xl tracking-[0.2em]">PAUSE</span>
               </>
             ) : (
               <>
                 <Play className="w-6 h-6 fill-current ml-1" />
-                <span className="text-lg tracking-[0.2em]">Start</span>
+                <span className="text-xl tracking-[0.2em]">START</span>
               </>
             )}
           </button>
@@ -193,15 +196,18 @@ function TimerPage() {
               onClick={() => setCurrentPage('settings')}
               className="flex items-center justify-center gap-3 py-5 bg-transparent hover:bg-white/5 rounded-2xl font-black uppercase text-sm tracking-[0.2em] transition-colors border-2 border-[#1f2923] text-white"
             >
-              <Pause className="w-5 h-5 fill-current" />
-              Settings
+              <div className="flex gap-1">
+                <div className="w-1.5 h-5 bg-current rounded-sm"></div>
+                <div className="w-1.5 h-5 bg-current rounded-sm"></div>
+              </div>
+              PAUSE
             </button>
             <button 
               onClick={resetTimer}
               className="flex items-center justify-center gap-3 py-5 bg-transparent hover:bg-white/5 rounded-2xl font-black uppercase text-sm tracking-[0.2em] transition-colors border-2 border-[#1f2923] text-white"
             >
-              <RotateCcw className="w-5 h-5" />
-              Reset
+              <RotateCcw className="w-5 h-5 stroke-[3]" />
+              RESET
             </button>
           </div>
         </div>
