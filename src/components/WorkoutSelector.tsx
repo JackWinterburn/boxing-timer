@@ -1,14 +1,9 @@
 import { useAtom } from 'jotai';
-import { ChevronLeft, Plus, Trash2, Check, Edit2 } from 'lucide-react';
+import { Box, Flex, Text, Button, Heading, Icon } from '@chakra-ui/react';
+import { MdChevronLeft, MdCheck, MdEdit, MdDelete, MdAdd } from 'react-icons/md';
 import { currentPageAtom, activeWorkoutAtom, appStateAtom, timeLeftAtom, currentRoundAtom, phaseAtom, totalTimeElapsedAtom, isRunningAtom, editingWorkoutIdAtom } from '../atoms';
 import { deleteWorkout, setActiveWorkout, saveAppState, getAppState } from '../storage';
 import { WorkoutConfig } from '../types';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 const formatDuration = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
@@ -86,75 +81,113 @@ export default function WorkoutSelector() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans overflow-y-auto">
-      <div className="flex-1 flex flex-col max-w-md mx-auto w-full p-4 pb-8 shadow-2xl">
+    <Box bg="#0d1410" minH="100vh" color="white" overflowY="auto" p={4} pb={8}>
+      <Flex direction="column" gap={6} maxW="md" mx="auto">
         {/* Header */}
-        <header className="flex items-center gap-4 py-4 mb-6">
-          <button 
+        <Flex align="center" py={4} gap={4}>
+          <Button
+            variant="ghost"
+            color="white"
             onClick={handleBack}
-            className="p-2 hover:bg-white/5 rounded-full transition-colors border-none bg-transparent"
+            p={2}
+            _hover={{ bg: 'whiteAlpha.100' }}
           >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-sm font-black tracking-[0.2em] uppercase text-white/90">Select Workout</h1>
-        </header>
+            <Icon as={MdChevronLeft} boxSize={6} />
+          </Button>
+          <Text
+            fontSize="sm"
+            fontWeight="black"
+            letterSpacing="0.2em"
+            textTransform="uppercase"
+            color="whiteAlpha.800"
+          >
+            Select Workout
+          </Text>
+        </Flex>
 
         {/* Workout List */}
-        <div className="space-y-3 flex-1">
+        <Flex direction="column" gap={3} flex={1}>
           {appState.workouts.map((workout) => (
-            <button
+            <Box
               key={workout.id}
+              as="button"
+              w="full"
+              p={5}
+              textAlign="left"
+              borderRadius="20px"
+              borderWidth="1px"
+              borderColor={activeWorkout.id === workout.id ? '#54f085' : '#1f2923'}
+              bg={activeWorkout.id === workout.id ? 'rgba(84,240,133,0.1)' : '#161e19'}
               onClick={() => handleSelectWorkout(workout)}
-              className={cn(
-                "w-full p-5 rounded-[20px] text-left transition-all border",
-                activeWorkout.id === workout.id 
-                  ? "bg-[#54f085]/10 border-[#54f085]" 
-                  : "bg-[#161e19] border-[#1f2923] hover:border-white/20"
-              )}
+              cursor="pointer"
+              _hover={{ borderColor: activeWorkout.id === workout.id ? '#54f085' : 'whiteAlpha.200' }}
+              transition="all 0.2s"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-black text-base">{workout.name}</h3>
+              <Flex justify="space-between" align="center">
+                <Box flex={1}>
+                  <Flex align="center" gap={2} mb={2}>
+                    <Heading size="sm" fontWeight="black">
+                      {workout.name}
+                    </Heading>
                     {activeWorkout.id === workout.id && (
-                      <Check className="w-4 h-4 text-[#54f085]" />
+                      <Icon as={MdCheck} color="#54f085" boxSize={4} />
                     )}
-                  </div>
-                  <p className="text-sm text-white/50">
+                  </Flex>
+                  <Text fontSize="sm" color="whiteAlpha.500">
                     {workout.totalRounds} rounds • {formatDuration(workout.roundDuration)} work • {formatDuration(workout.restDuration)} rest
                     {workout.preparationTime > 0 && ` • ${workout.preparationTime}s prep`}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <button
+                  </Text>
+                </Box>
+                <Flex gap={1}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    color="whiteAlpha.600"
                     onClick={(e) => handleEditWorkout(workout.id, e)}
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors border-none bg-transparent"
+                    _hover={{ bg: 'whiteAlpha.100' }}
+                    p={2}
                   >
-                    <Edit2 className="w-4 h-4 text-white/60" />
-                  </button>
+                    <Icon as={MdEdit} boxSize={4} />
+                  </Button>
                   {workout.id !== 'default' && (
-                    <button
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      color="red.400"
                       onClick={(e) => handleDeleteWorkout(workout.id, e)}
-                      className="p-2 hover:bg-red-500/20 rounded-full transition-colors border-none bg-transparent"
+                      _hover={{ bg: 'rgba(245,101,101,0.2)' }}
+                      p={2}
                     >
-                      <Trash2 className="w-4 h-4 text-red-400" />
-                    </button>
+                      <Icon as={MdDelete} boxSize={4} />
+                    </Button>
                   )}
-                </div>
-              </div>
-            </button>
+                </Flex>
+              </Flex>
+            </Box>
           ))}
-        </div>
+        </Flex>
 
         {/* Create New Button */}
-        <button 
+        <Button
+          w="full"
+          size="lg"
+          variant="outline"
+          borderWidth="1px"
+          borderColor="#1f2923"
+          bg="#161e19"
+          color="white"
+          py={7}
+          borderRadius="20px"
+          fontWeight="black"
+          fontSize="sm"
+          letterSpacing="0.2em"
           onClick={handleCreateNew}
-          className="w-full bg-[#161e19] hover:bg-white/5 text-white font-black uppercase py-5 rounded-[20px] flex items-center justify-center gap-2 transition-all border border-[#1f2923] mt-6 mb-4"
+          _hover={{ bg: 'whiteAlpha.50' }}
         >
-          <Plus className="w-5 h-5" />
-          <span className="text-[14px] tracking-[0.2em]">Create New Workout</span>
-        </button>
-      </div>
-    </div>
+          <Icon as={MdAdd} mr={2} />
+          Create New Workout
+        </Button>
+      </Flex>
+    </Box>
   );
 }

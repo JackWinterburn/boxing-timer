@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { ChevronLeft, Clock, Coffee, Volume2, Smartphone, Zap, Bell, Hourglass } from 'lucide-react';
+import { Box, Flex, Text, Button, Heading, Input, Icon } from '@chakra-ui/react';
+import { MdChevronLeft, MdAccessTime, MdCoffee, MdVolumeUp, MdPhoneIphone, MdFlashOn, MdNotifications, MdHourglassEmpty } from 'react-icons/md';
 import { currentPageAtom, activeWorkoutAtom, appStateAtom, timeLeftAtom, currentRoundAtom, phaseAtom, totalTimeElapsedAtom, isRunningAtom, editingWorkoutIdAtom } from '../atoms';
 import { WorkoutConfig, DEFAULT_WORKOUT } from '../types';
 import { saveWorkout, generateId, setActiveWorkout, getAppState } from '../storage';
@@ -105,213 +106,288 @@ export default function Settings() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#0d1410] text-white font-sans">
-      <div className="flex-1 flex flex-col max-w-md mx-auto w-full px-5 pb-6 shadow-2xl">
+    <Box bg="#0d1410" minH="100vh" color="white" px={5} pb={6}>
+      <Flex direction="column" gap={6} maxW="md" mx="auto">
         {/* Header */}
-        <header className="flex items-center gap-3 py-5 sticky top-0 bg-[#0d1410] z-10">
-          <button 
+        <Flex align="center" py={5} gap={3}>
+          <Button
+            variant="ghost"
+            color="white"
             onClick={handleBack}
-            className="p-2 -ml-2 hover:bg-white/5 rounded-full transition-colors border-none bg-transparent"
+            p={2}
+            _hover={{ bg: 'whiteAlpha.100' }}
           >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-base font-bold">
+            <Icon as={MdChevronLeft} boxSize={6} />
+          </Button>
+          <Heading size="md" fontWeight="bold">
             {isNewWorkout ? 'New Workout' : 'Edit Workout'}
-          </h1>
-        </header>
+          </Heading>
+        </Flex>
 
         {/* Workout Name */}
-        <div className="mb-8">
-          <label className="text-xs font-bold uppercase tracking-wider text-[#54f085] block mb-3">
+        <Box>
+          <Text
+            fontSize="xs"
+            fontWeight="bold"
+            letterSpacing="wider"
+            textTransform="uppercase"
+            color="#54f085"
+            mb={3}
+          >
             Workout Name
-          </label>
-          <input
-            type="text"
+          </Text>
+          <Input
             value={workout.name}
             onChange={(e) => updateWorkout({ name: e.target.value })}
             placeholder="e.g., Morning Sparring"
-            className="w-full bg-transparent border-b border-white/20 py-3 text-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#54f085] transition-colors"
+            variant="flushed"
+            size="lg"
+            borderColor="whiteAlpha.200"
+            _focus={{ borderColor: '#54f085' }}
+            _placeholder={{ color: 'whiteAlpha.400' }}
           />
-        </div>
+        </Box>
 
         {/* Workout Parameters */}
-        <div className="mb-8">
-          <h2 className="text-lg font-bold mb-5">Workout Parameters</h2>
-          
+        <Box>
+          <Heading size="md" fontWeight="bold" mb={5}>
+            Workout Parameters
+          </Heading>
+
           {/* Prep Time */}
-          <button 
+          <Button
+            w="full"
+            variant="ghost"
+            display="flex"
+            justifyContent="space-between"
+            py={8}
+            borderBottomWidth="1px"
+            borderColor="whiteAlpha.100"
             onClick={cyclePrepTime}
-            className="w-full flex items-center justify-between py-4 border-b border-white/10 bg-transparent border-x-0 border-t-0"
+            _hover={{ bg: 'whiteAlpha.50' }}
           >
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-yellow-400/15 rounded-xl flex items-center justify-center">
-                <Hourglass className="w-5 h-5 text-yellow-400" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-base">Prep Time</p>
-                <p className="text-xs text-white/50 mt-0.5">Countdown before start</p>
-              </div>
-            </div>
-            <span className="text-yellow-400 font-bold text-lg">
+            <Flex align="center" gap={4}>
+              <Box
+                w={10}
+                h={10}
+                bg="rgba(250,204,21,0.15)"
+                borderRadius="xl"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Icon as={MdHourglassEmpty} color="#facc15" boxSize={5} />
+              </Box>
+              <Box textAlign="left">
+                <Text fontWeight="semibold">Prep Time</Text>
+                <Text fontSize="xs" color="whiteAlpha.500">Countdown before start</Text>
+              </Box>
+            </Flex>
+            <Text color="#facc15" fontWeight="bold" fontSize="lg">
               {workout.preparationTime === 0 ? 'Off' : `${workout.preparationTime}s`}
-            </span>
-          </button>
+            </Text>
+          </Button>
 
           {/* Round Duration */}
-          <button 
+          <Button
+            w="full"
+            variant="ghost"
+            display="flex"
+            justifyContent="space-between"
+            py={8}
+            borderBottomWidth="1px"
+            borderColor="whiteAlpha.100"
             onClick={cycleRoundDuration}
-            className="w-full flex items-center justify-between py-4 border-b border-white/10 bg-transparent border-x-0 border-t-0"
+            _hover={{ bg: 'whiteAlpha.50' }}
           >
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-[#54f085]/15 rounded-xl flex items-center justify-center">
-                <Clock className="w-5 h-5 text-[#54f085]" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-base">Round Duration</p>
-                <p className="text-xs text-white/50 mt-0.5">Standard training length</p>
-              </div>
-            </div>
-            <span className="text-[#54f085] font-bold text-lg">{formatTime(workout.roundDuration)}</span>
-          </button>
+            <Flex align="center" gap={4}>
+              <Box
+                w={10}
+                h={10}
+                bg="rgba(84,240,133,0.15)"
+                borderRadius="xl"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Icon as={MdAccessTime} color="#54f085" boxSize={5} />
+              </Box>
+              <Box textAlign="left">
+                <Text fontWeight="semibold">Round Duration</Text>
+                <Text fontSize="xs" color="whiteAlpha.500">Standard training length</Text>
+              </Box>
+            </Flex>
+            <Text color="#54f085" fontWeight="bold" fontSize="lg">
+              {formatTime(workout.roundDuration)}
+            </Text>
+          </Button>
 
           {/* Rest Duration */}
-          <button 
+          <Button
+            w="full"
+            variant="ghost"
+            display="flex"
+            justifyContent="space-between"
+            py={8}
+            borderBottomWidth="1px"
+            borderColor="whiteAlpha.100"
             onClick={cycleRestDuration}
-            className="w-full flex items-center justify-between py-4 border-b border-white/10 bg-transparent border-x-0 border-t-0"
+            _hover={{ bg: 'whiteAlpha.50' }}
           >
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-orange-400/15 rounded-xl flex items-center justify-center">
-                <Coffee className="w-5 h-5 text-orange-400" />
-              </div>
-              <p className="font-semibold text-base">Rest Duration</p>
-            </div>
-            <span className="text-orange-400 font-bold text-lg">{formatTime(workout.restDuration)}</span>
-          </button>
+            <Flex align="center" gap={4}>
+              <Box
+                w={10}
+                h={10}
+                bg="rgba(251,146,60,0.15)"
+                borderRadius="xl"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Icon as={MdCoffee} color="#fb923c" boxSize={5} />
+              </Box>
+              <Text fontWeight="semibold">Rest Duration</Text>
+            </Flex>
+            <Text color="#fb923c" fontWeight="bold" fontSize="lg">
+              {formatTime(workout.restDuration)}
+            </Text>
+          </Button>
 
           {/* Total Rounds */}
-          <div className="pt-6 pb-4">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-white/50">Total Rounds</span>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#54f085]">Pro Setting</span>
-            </div>
-            <div className="flex items-baseline gap-2 mb-5">
-              <span className="text-4xl font-black">{workout.totalRounds}</span>
-              <span className="text-base text-white/50">rounds</span>
-            </div>
-            
-            <div className="relative">
-              <input
-                type="range"
-                min="1"
-                max="24"
-                value={workout.totalRounds}
-                onChange={(e) => updateWorkout({ totalRounds: parseInt(e.target.value) })}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                style={{
-                  background: `linear-gradient(to right, #54f085 0%, #54f085 ${((workout.totalRounds - 1) / 23) * 100}%, #1a3a2a ${((workout.totalRounds - 1) / 23) * 100}%, #1a3a2a 100%)`
-                }}
-              />
-              <div className="flex justify-between mt-3 px-1">
-                {[1, 6, 12, 18, 24].map((mark) => (
-                  <span key={mark} className="text-xs text-white/40 font-medium">{mark}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+          <Box pt={6} pb={4}>
+            <Flex justify="space-between" mb={3}>
+              <Text fontSize="xs" fontWeight="bold" letterSpacing="wider" textTransform="uppercase" color="whiteAlpha.500">
+                Total Rounds
+              </Text>
+              <Text fontSize="xs" fontWeight="bold" letterSpacing="wider" textTransform="uppercase" color="#54f085">
+                Pro Setting
+              </Text>
+            </Flex>
+            <Flex align="baseline" gap={2} mb={5}>
+              <Text fontSize="4xl" fontWeight="black">{workout.totalRounds}</Text>
+              <Text fontSize="md" color="whiteAlpha.500">rounds</Text>
+            </Flex>
+            <input
+              type="range"
+              value={workout.totalRounds}
+              min={1}
+              max={24}
+              onChange={(e) => updateWorkout({ totalRounds: Number(e.target.value) })}
+              style={{
+                width: '100%',
+                accentColor: '#54f085',
+                height: '8px',
+                borderRadius: '4px',
+              }}
+            />
+            <Flex justify="space-between" mt={3}>
+              {[1, 6, 12, 18, 24].map((mark) => (
+                <Text key={mark} fontSize="xs" color="whiteAlpha.400">{mark}</Text>
+              ))}
+            </Flex>
+          </Box>
+        </Box>
 
         {/* Notifications & Feedback */}
-        <div className="mb-8">
-          <h2 className="text-lg font-bold mb-5">Notifications & Feedback</h2>
-          
-          <div className="space-y-1">
-            <div className="flex items-center justify-between py-3">
-              <div className="flex items-center gap-4">
-                <Volume2 className="w-5 h-5 text-white/60" />
-                <span className="font-medium">Sound Effects</span>
-              </div>
-              <button
-                onClick={() => updateWorkout({ soundEffects: !workout.soundEffects })}
-                className="w-14 h-8 rounded-full transition-all duration-200 border-none relative flex items-center px-1"
-                style={{ backgroundColor: workout.soundEffects ? '#54f085' : 'rgba(255,255,255,0.15)' }}
-              >
-                <div 
-                  className="w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200"
-                  style={{ transform: workout.soundEffects ? 'translateX(24px)' : 'translateX(0)' }}
-                />
-              </button>
-            </div>
+        <Box>
+          <Heading size="md" fontWeight="bold" mb={5}>
+            Notifications & Feedback
+          </Heading>
 
-            <div className="flex items-center justify-between py-3">
-              <div className="flex items-center gap-4">
-                <Smartphone className="w-5 h-5 text-white/60" />
-                <span className="font-medium">Vibration</span>
-              </div>
-              <button
-                onClick={() => updateWorkout({ vibration: !workout.vibration })}
-                className="w-14 h-8 rounded-full transition-all duration-200 border-none relative flex items-center px-1"
-                style={{ backgroundColor: workout.vibration ? '#54f085' : 'rgba(255,255,255,0.15)' }}
-              >
-                <div 
-                  className="w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200"
-                  style={{ transform: workout.vibration ? 'translateX(24px)' : 'translateX(0)' }}
-                />
-              </button>
-            </div>
+          <Flex direction="column" gap={1}>
+            <Flex w="full" justify="space-between" align="center" py={3}>
+              <Flex align="center" gap={4}>
+                <Icon as={MdVolumeUp} color="whiteAlpha.600" boxSize={5} />
+                <Text fontWeight="medium">Sound Effects</Text>
+              </Flex>
+              <input
+                type="checkbox"
+                checked={workout.soundEffects}
+                onChange={() => updateWorkout({ soundEffects: !workout.soundEffects })}
+                style={{ width: '20px', height: '20px', accentColor: '#54f085' }}
+              />
+            </Flex>
 
-            <div className="flex items-center justify-between py-3">
-              <div className="flex items-center gap-4">
-                <Zap className="w-5 h-5 text-white/60" />
-                <span className="font-medium">Visual Flash</span>
-              </div>
-              <button
-                onClick={() => updateWorkout({ visualFlash: !workout.visualFlash })}
-                className="w-14 h-8 rounded-full transition-all duration-200 border-none relative flex items-center px-1"
-                style={{ backgroundColor: workout.visualFlash ? '#54f085' : 'rgba(255,255,255,0.15)' }}
-              >
-                <div 
-                  className="w-6 h-6 bg-white rounded-full shadow-md transition-all duration-200"
-                  style={{ transform: workout.visualFlash ? 'translateX(24px)' : 'translateX(0)' }}
-                />
-              </button>
-            </div>
-          </div>
-        </div>
+            <Flex w="full" justify="space-between" align="center" py={3}>
+              <Flex align="center" gap={4}>
+                <Icon as={MdPhoneIphone} color="whiteAlpha.600" boxSize={5} />
+                <Text fontWeight="medium">Vibration</Text>
+              </Flex>
+              <input
+                type="checkbox"
+                checked={workout.vibration}
+                onChange={() => updateWorkout({ vibration: !workout.vibration })}
+                style={{ width: '20px', height: '20px', accentColor: '#54f085' }}
+              />
+            </Flex>
+
+            <Flex w="full" justify="space-between" align="center" py={3}>
+              <Flex align="center" gap={4}>
+                <Icon as={MdFlashOn} color="whiteAlpha.600" boxSize={5} />
+                <Text fontWeight="medium">Visual Flash</Text>
+              </Flex>
+              <input
+                type="checkbox"
+                checked={workout.visualFlash}
+                onChange={() => updateWorkout({ visualFlash: !workout.visualFlash })}
+                style={{ width: '20px', height: '20px', accentColor: '#54f085' }}
+              />
+            </Flex>
+          </Flex>
+        </Box>
 
         {/* Advanced */}
-        <div className="mb-8">
-          <h2 className="text-lg font-bold mb-5">Advanced</h2>
-          
-          <div className="space-y-1">
-            <button
-              onClick={() => {
-                const times = [10, 30, 60];
-                const currentIndex = times.indexOf(workout.warningSignal);
-                const nextIndex = (currentIndex + 1) % times.length;
-                updateWorkout({ warningSignal: times[nextIndex] });
-              }}
-              className="w-full flex items-center justify-between py-3 bg-transparent border-none"
-            >
-              <div className="flex items-center gap-4">
-                <Bell className="w-5 h-5 text-white/60" />
-                <span className="font-medium">Warning Signal</span>
-              </div>
-              <span className="text-white/70 font-medium">{workout.warningSignal}s before end</span>
-            </button>
-          </div>
-        </div>
+        <Box>
+          <Heading size="md" fontWeight="bold" mb={5}>
+            Advanced
+          </Heading>
+
+          <Button
+            w="full"
+            variant="ghost"
+            display="flex"
+            justifyContent="space-between"
+            py={3}
+            onClick={() => {
+              const times = [10, 30, 60];
+              const currentIndex = times.indexOf(workout.warningSignal);
+              const nextIndex = (currentIndex + 1) % times.length;
+              updateWorkout({ warningSignal: times[nextIndex] });
+            }}
+            _hover={{ bg: 'whiteAlpha.50' }}
+          >
+            <Flex align="center" gap={4}>
+              <Icon as={MdNotifications} color="whiteAlpha.600" boxSize={5} />
+              <Text fontWeight="medium">Warning Signal</Text>
+            </Flex>
+            <Text color="whiteAlpha.700" fontWeight="medium">
+              {workout.warningSignal}s before end
+            </Text>
+          </Button>
+        </Box>
 
         {/* Spacer */}
-        <div className="flex-1 min-h-4" />
+        <Box flex={1} minH={4} />
 
         {/* Save Button */}
-        <button 
+        <Button
+          w="full"
+          size="lg"
+          bg="#54f085"
+          color="#0d1410"
+          py={7}
+          borderRadius="2xl"
+          fontWeight="black"
+          fontSize="sm"
+          letterSpacing="widest"
           onClick={handleSave}
-          className="w-full bg-[#54f085] hover:bg-[#4de079] text-[#0d1410] font-black uppercase py-4 rounded-2xl flex items-center justify-center transition-all active:scale-[0.98] border-none shadow-[0_4px_20px_rgba(84,240,133,0.3)] text-sm tracking-widest"
+          _hover={{ bg: '#4de079' }}
+          _active={{ transform: 'scale(0.98)' }}
+          boxShadow="0 4px 20px rgba(84,240,133,0.3)"
         >
           {isNewWorkout ? 'Create Workout' : 'Save Changes'}
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Flex>
+    </Box>
   );
 }

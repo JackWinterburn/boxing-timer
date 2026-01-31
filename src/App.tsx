@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { Play, RotateCcw, ChevronDown } from "lucide-react";
+import { Box, Flex, Text, Button, Heading, Grid, Icon } from "@chakra-ui/react";
+import { FaPlay, FaPause } from "react-icons/fa";
+import { MdRefresh, MdKeyboardArrowDown, MdEdit } from "react-icons/md";
 import {
   currentRoundAtom,
   timeLeftAtom,
@@ -13,12 +15,6 @@ import {
 } from "./atoms";
 import Settings from "./components/Settings";
 import WorkoutSelector from "./components/WorkoutSelector";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
@@ -46,7 +42,7 @@ function TimerPage() {
   useEffect(() => {
     if (isRunning) {
       timerRef.current = window.setInterval(() => {
-        if (phase !== 'prep') {
+        if (phase !== "prep") {
           setTotalTimeElapsed((prev) => prev + 1);
         }
         setTimeLeft((prev) => {
@@ -120,9 +116,9 @@ function TimerPage() {
   const progress = getProgress();
 
   const getPhaseColor = () => {
-    if (phase === "prep") return "text-yellow-400";
-    if (phase === "work") return "text-[#54f085]";
-    return "text-orange-400";
+    if (phase === "prep") return "#facc15";
+    if (phase === "work") return "#54f085";
+    return "#fb923c";
   };
 
   const getPhaseLabel = () => {
@@ -136,162 +132,258 @@ function TimerPage() {
     setCurrentPage("settings");
   };
 
+  const circumference = 2 * Math.PI * 95;
+
   return (
-    <div
-      className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 safe-area-inset overflow-hidden"
-      style={{ maxWidth: "480px", margin: "0 auto" }}
+    <Box
+      bg="#0d1410"
+      minH="100vh"
+      color="white"
+      maxW="480px"
+      mx="auto"
+      px={4}
+      pt={2}
+      pb={24}
     >
-      <div className="flex-1 flex flex-col max-w-md mx-auto w-full px-4 pt-2 pb-24 overflow-hidden shadow-2xl">
+      <Flex direction="column" gap={4}>
         {/* Header */}
-        <header className="flex items-center justify-center py-4 relative">
-          <h1 className="text-[11px] font-black tracking-[0.4em] uppercase text-white/90">
+        <Box textAlign="center" py={4}>
+          <Text
+            fontSize="xs"
+            fontWeight="black"
+            letterSpacing="0.4em"
+            textTransform="uppercase"
+            color="whiteAlpha.800"
+          >
             Boxing Timer
-          </h1>
-        </header>
+          </Text>
+        </Box>
 
         {/* Round Info */}
-        <div className="text-center mt-4 shrink-0">
-          <h2 className="text-3xl font-black mb-1 tracking-tight">
+        <Flex direction="column" align="center" gap={2}>
+          <Heading size="lg" fontWeight="black">
             {phase === "prep" ? "Prepare" : `Round ${currentRound}/${roundCount}`}
-          </h2>
-          <p
-            className={cn(
-              "text-[10px] font-black tracking-[0.2em] uppercase mb-2",
-              getPhaseColor()
-            )}
+          </Heading>
+          <Text
+            fontSize="xs"
+            fontWeight="black"
+            letterSpacing="0.2em"
+            textTransform="uppercase"
+            color={getPhaseColor()}
           >
             {getPhaseLabel()}
-          </p>
-          <button
+          </Text>
+          <Button
+            size="sm"
+            variant="outline"
+            borderColor="whiteAlpha.200"
+            bg="whiteAlpha.50"
+            color="whiteAlpha.700"
+            fontSize="xs"
+            fontWeight="medium"
+            letterSpacing="0.1em"
+            textTransform="uppercase"
             onClick={() => setCurrentPage("workouts")}
-            className="inline-flex items-center gap-1 text-[10px] font-medium tracking-[0.1em] uppercase px-3 py-1.5 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors text-white/70"
+            _hover={{ bg: "whiteAlpha.100" }}
           >
             {activeWorkout.name}
-            <ChevronDown className="w-3 h-3" />
-          </button>
-        </div>
+            <Icon as={MdKeyboardArrowDown} ml={1} />
+          </Button>
+        </Flex>
 
         {/* Main Timer Display */}
-        <div className="flex-1 flex flex-col items-center justify-center min-h-0 py-4 shrink">
-          <div className="relative w-full max-w-[340px] aspect-square flex items-center justify-center">
-            <svg
-              className="absolute inset-0 w-full h-full -rotate-90"
-              viewBox="0 0 200 200"
-            >
-              {/* Background Circle */}
-              <circle
-                cx="100"
-                cy="100"
-                r="95"
-                fill="none"
-                stroke="rgba(255,255,255,0.05)"
-                strokeWidth="2"
-              />
-              {/* Progress Circle */}
-              <circle
-                cx="100"
-                cy="100"
-                r="95"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="4"
-                strokeDasharray={2 * Math.PI * 95}
-                strokeDashoffset={
-                  2 * Math.PI * 95 - (progress / 100) * (2 * Math.PI * 95)
-                }
-                strokeLinecap="round"
-                className={cn(
-                  "transition-all duration-300",
+        <Box
+          position="relative"
+          w="full"
+          maxW="340px"
+          mx="auto"
+          aspectRatio={1}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Box
+            as="svg"
+            position="absolute"
+            inset={0}
+            w="full"
+            h="full"
+            transform="rotate(-90deg)"
+            viewBox="0 0 200 200"
+          >
+            <circle
+              cx="100"
+              cy="100"
+              r="95"
+              fill="none"
+              stroke="rgba(255,255,255,0.05)"
+              strokeWidth="2"
+            />
+            <circle
+              cx="100"
+              cy="100"
+              r="95"
+              fill="none"
+              stroke={getPhaseColor()}
+              strokeWidth="4"
+              strokeDasharray={circumference}
+              strokeDashoffset={circumference - (progress / 100) * circumference}
+              strokeLinecap="round"
+              style={{
+                transition: "stroke-dashoffset 0.3s ease",
+                filter:
                   phase === "prep"
-                    ? "text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.4)]"
+                    ? "drop-shadow(0 0 10px rgba(250,204,21,0.4))"
                     : phase === "work"
-                    ? "text-[#54f085] drop-shadow-[0_0_10px_rgba(84,240,133,0.4)]"
-                    : "text-orange-400"
-                )}
-              />
-            </svg>
+                    ? "drop-shadow(0 0 10px rgba(84,240,133,0.4))"
+                    : "none",
+              }}
+            />
+          </Box>
 
-            <div className="flex flex-col items-center justify-center z-10 w-full">
-              <div
-                className={cn(
-                  "text-[9rem] sm:text-[12rem] font-black tracking-[-0.08em] leading-none text-center w-full",
-                  phase === "prep"
-                    ? "text-yellow-400 [text-shadow:0_0_40px_rgba(250,204,21,0.7)]"
-                    : phase === "work"
-                    ? "text-[#54f085] [text-shadow:0_0_40px_rgba(84,240,133,0.7)]"
-                    : "text-orange-400"
-                )}
-              >
-                {formatTime(timeLeft)}
-              </div>
-            </div>
-          </div>
-        </div>
+          <Text
+            fontSize={{ base: "7xl", sm: "9xl" }}
+            fontWeight="black"
+            letterSpacing="-0.08em"
+            color={getPhaseColor()}
+            textShadow={
+              phase === "prep"
+                ? "0 0 40px rgba(250,204,21,0.7)"
+                : phase === "work"
+                ? "0 0 40px rgba(84,240,133,0.7)"
+                : "none"
+            }
+            zIndex={1}
+          >
+            {formatTime(timeLeft)}
+          </Text>
+        </Box>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 mb-8 shrink-0">
-          <div className="bg-[#161e19] border border-[#1f2923] rounded-2xl p-6 text-center flex flex-col justify-center items-center shadow-inner">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2">
+        <Grid templateColumns="repeat(2, 1fr)" gap={4} mb={8}>
+          <Box
+            bg="#161e19"
+            borderWidth="1px"
+            borderColor="#1f2923"
+            borderRadius="2xl"
+            p={6}
+            textAlign="center"
+          >
+            <Text
+              fontSize="xs"
+              fontWeight="black"
+              letterSpacing="0.2em"
+              textTransform="uppercase"
+              color="whiteAlpha.300"
+              mb={2}
+            >
               Rest
-            </span>
-            <span className="text-3xl font-black tabular-nums">
+            </Text>
+            <Text fontSize="3xl" fontWeight="black" fontFamily="mono">
               {formatTime(restTime)}
-            </span>
-          </div>
-          <div className="bg-[#161e19] border border-[#1f2923] rounded-2xl p-6 text-center flex flex-col justify-center items-center shadow-inner">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2">
+            </Text>
+          </Box>
+          <Box
+            bg="#161e19"
+            borderWidth="1px"
+            borderColor="#1f2923"
+            borderRadius="2xl"
+            p={6}
+            textAlign="center"
+          >
+            <Text
+              fontSize="xs"
+              fontWeight="black"
+              letterSpacing="0.2em"
+              textTransform="uppercase"
+              color="whiteAlpha.300"
+              mb={2}
+            >
               Total
-            </span>
-            <span className="text-3xl font-black tabular-nums">
+            </Text>
+            <Text fontSize="3xl" fontWeight="black" fontFamily="mono">
               {formatTime(totalTimeElapsed)}
-            </span>
-          </div>
-        </div>
+            </Text>
+          </Box>
+        </Grid>
 
         {/* Controls */}
-        <div className="space-y-4 shrink-0 mb-24">
-          <button
+        <Flex direction="column" gap={4} mb={24}>
+          <Button
+            w="full"
+            size="lg"
+            bg="#54f085"
+            color="#0d1410"
+            py={7}
+            borderRadius="2xl"
+            fontWeight="black"
+            fontSize="xl"
+            letterSpacing="0.2em"
             onClick={toggleTimer}
-            className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] border-none shadow-[0_10px_30px_rgba(84,240,133,0.3)]"
+            _hover={{ bg: "#4de079" }}
+            _active={{ transform: "scale(0.98)" }}
+            boxShadow="0 10px 30px rgba(84,240,133,0.3)"
           >
-            {isRunning ? (
-              <>
-                <div className="flex gap-1">
-                  <div className="w-2 h-6 bg-current rounded-sm"></div>
-                  <div className="w-2 h-6 bg-current rounded-sm"></div>
-                </div>
-                <span className="text-xl tracking-[0.2em]">PAUSE</span>
-              </>
-            ) : (
-              <>
-                <Play className="w-6 h-6 fill-current ml-1" />
-                <span className="text-xl tracking-[0.2em]">START</span>
-              </>
-            )}
-          </button>
+            <Flex align="center" gap={3}>
+              {isRunning ? (
+                <>
+                  <Icon as={FaPause} boxSize={5} />
+                  <Text>PAUSE</Text>
+                </>
+              ) : (
+                <>
+                  <Icon as={FaPlay} boxSize={5} />
+                  <Text>START</Text>
+                </>
+              )}
+            </Flex>
+          </Button>
 
-          <div className="grid grid-cols-2 gap-4">
-            <button
+          <Grid templateColumns="repeat(2, 1fr)" gap={4} w="full">
+            <Button
+              w="full"
+              size="lg"
+              variant="outline"
+              borderWidth="2px"
+              borderColor="#1f2923"
+              color="white"
+              py={7}
+              borderRadius="2xl"
+              fontWeight="black"
+              fontSize="sm"
+              letterSpacing="0.2em"
               onClick={handleEditWorkout}
-              className="flex items-center justify-center gap-3 py-5 bg-transparent hover:bg-white/5 rounded-2xl font-black uppercase text-sm tracking-[0.2em] transition-colors border-2 border-[#1f2923] text-white"
+              _hover={{ bg: "whiteAlpha.50" }}
             >
-              <div className="flex gap-1">
-                <div className="w-1.5 h-5 bg-current rounded-sm"></div>
-                <div className="w-1.5 h-5 bg-current rounded-sm"></div>
-              </div>
-              EDIT
-            </button>
-            <button
+              <Flex align="center" gap={3}>
+                <Icon as={MdEdit} boxSize={5} />
+                <Text>EDIT</Text>
+              </Flex>
+            </Button>
+            <Button
+              w="full"
+              size="lg"
+              variant="outline"
+              borderWidth="2px"
+              borderColor="#1f2923"
+              color="white"
+              py={7}
+              borderRadius="2xl"
+              fontWeight="black"
+              fontSize="sm"
+              letterSpacing="0.2em"
               onClick={resetTimer}
-              className="flex items-center justify-center gap-3 py-5 bg-transparent hover:bg-white/5 rounded-2xl font-black uppercase text-sm tracking-[0.2em] transition-colors border-2 border-[#1f2923] text-white"
+              _hover={{ bg: "whiteAlpha.50" }}
             >
-              <RotateCcw className="w-5 h-5 stroke-[3]" />
-              RESET
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+              <Flex align="center" gap={3}>
+                <Icon as={MdRefresh} boxSize={5} />
+                <Text>RESET</Text>
+              </Flex>
+            </Button>
+          </Grid>
+        </Flex>
+      </Flex>
+    </Box>
   );
 }
 

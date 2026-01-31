@@ -1,7 +1,7 @@
 # Boxing Timer App
 
 ## Overview
-A mobile-first boxing timer application built with React, Vite, TypeScript, and Jotai.
+A mobile-first boxing timer application built with React, Vite, TypeScript, Jotai, and Chakra UI v3.
 
 ## Project Structure
 - `src/` - React source code
@@ -9,8 +9,8 @@ A mobile-first boxing timer application built with React, Vite, TypeScript, and 
   - `atoms.ts` - Jotai state atoms (timer state, phases, navigation)
   - `types.ts` - TypeScript type definitions for WorkoutConfig
   - `storage.ts` - localStorage utilities for workout persistence
-  - `main.tsx` - Application entry point
-  - `index.css` - Tailwind CSS styles
+  - `theme.ts` - Chakra UI v3 theme configuration
+  - `main.tsx` - Application entry point with ChakraProvider
   - `components/` - React components
     - `Settings.tsx` - Workout settings/editor page
     - `WorkoutSelector.tsx` - Saved workouts menu with edit/delete
@@ -18,8 +18,9 @@ A mobile-first boxing timer application built with React, Vite, TypeScript, and 
 ## Tech Stack
 - React 18
 - Jotai (State Management)
-- Tailwind CSS (Styling)
-- Lucide React (Icons)
+- Chakra UI v3 (Component Library & Styling)
+- @emotion/react (CSS-in-JS)
+- react-icons (Icons)
 - Vite 5 (Build System)
 
 ## Development
@@ -56,3 +57,11 @@ npm run build
 - Total rounds (1-24)
 - Sound effects, vibration, visual flash toggles
 - Warning signal timing
+
+## Theme Colors (Chakra UI v3)
+- Background: #0d1410
+- Card: #161e19
+- Border: #1f2923
+- Green (Work): #54f085
+- Yellow (Prep): #facc15
+- Orange (Rest): #fb923c
