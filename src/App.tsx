@@ -303,13 +303,14 @@ function TimerPage() {
           justifyContent="center"
           flex="0 0 auto"
         >
-          <Box
-            as="svg"
-            position="absolute"
-            inset={0}
-            w="full"
-            h="full"
-            transform="rotate(-90deg)"
+          <svg
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              transform: "rotate(-90deg)",
+            }}
             viewBox="0 0 200 200"
           >
             <circle
@@ -342,7 +343,7 @@ function TimerPage() {
                     : "none",
               }}
             />
-          </Box>
+          </svg>
 
           {phase === "complete" ? (
             <Flex
