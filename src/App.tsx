@@ -81,8 +81,6 @@ export default function App() {
     ? (1 - timeLeft / workTime) * 100 
     : (1 - timeLeft / restTime) * 100;
 
-  const circum = 2 * Math.PI * 90;
-
   return (
     <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 p-4 pb-8 safe-area-inset overflow-hidden">
       <div className="flex-1 flex flex-col max-w-md mx-auto w-full overflow-hidden">
@@ -108,27 +106,27 @@ export default function App() {
 
         {/* Main Timer Display */}
         <div className="flex-1 flex flex-col items-center justify-center min-h-0 py-4 shrink">
-          <div className="relative w-full max-w-[280px] aspect-square flex items-center justify-center">
+          <div className="relative w-full max-w-[340px] aspect-square flex items-center justify-center">
             <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 200 200">
               {/* Background Circle */}
               <circle
                 cx="100"
                 cy="100"
-                r="90"
+                r="95"
                 fill="none"
                 stroke="rgba(255,255,255,0.05)"
-                strokeWidth="4"
+                strokeWidth="2"
               />
               {/* Progress Circle */}
               <circle
                 cx="100"
                 cy="100"
-                r="90"
+                r="95"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="6"
-                strokeDasharray={circum}
-                strokeDashoffset={circum - (progress / 100) * circum}
+                strokeWidth="4"
+                strokeDasharray={2 * Math.PI * 95}
+                strokeDashoffset={(2 * Math.PI * 95) - (progress / 100) * (2 * Math.PI * 95)}
                 strokeLinecap="round"
                 className={cn(
                   "transition-all duration-300",
@@ -137,10 +135,10 @@ export default function App() {
               />
             </svg>
             
-            <div className="flex flex-col items-center justify-center z-10">
+            <div className="flex flex-col items-center justify-center z-10 w-full">
               <div className={cn(
-                "text-9xl sm:text-[11rem] font-black tracking-[-0.05em] leading-none",
-                phase === 'work' ? "text-[#54f085] [text-shadow:0_0_20px_rgba(84,240,133,0.5)]" : "text-orange-400"
+                "text-[12rem] sm:text-[16rem] font-black tracking-[-0.08em] leading-none text-center w-full",
+                phase === 'work' ? "text-[#54f085] [text-shadow:0_0_40px_rgba(84,240,133,0.7)]" : "text-orange-400"
               )}>
                 {formatTime(timeLeft)}
               </div>
