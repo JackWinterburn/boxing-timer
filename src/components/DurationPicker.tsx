@@ -27,23 +27,39 @@ function WheelColumn({
   accentColor: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollTimeoutRef = useRef<number | null>(null);
   const selectedIndex = values.indexOf(selectedValue);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    if (containerRef.current && selectedIndex >= 0) {
-      containerRef.current.scrollTop = selectedIndex * ITEM_HEIGHT;
+    if (containerRef.current) {
+      const targetScroll = Math.max(0, selectedIndex) * ITEM_HEIGHT;
+      if (isInitialMount.current) {
+        containerRef.current.scrollTop = targetScroll;
+        isInitialMount.current = false;
+      } else {
+        containerRef.current.scrollTo({
+          top: targetScroll,
+          behavior: 'smooth',
+        });
+      }
     }
   }, [selectedIndex]);
 
   const handleScroll = () => {
-    if (containerRef.current) {
-      const scrollTop = containerRef.current.scrollTop;
-      const index = Math.round(scrollTop / ITEM_HEIGHT);
-      const clampedIndex = Math.max(0, Math.min(index, values.length - 1));
-      if (values[clampedIndex] !== selectedValue) {
-        onSelect(values[clampedIndex]);
-      }
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
     }
+    scrollTimeoutRef.current = window.setTimeout(() => {
+      if (containerRef.current) {
+        const scrollTop = containerRef.current.scrollTop;
+        const index = Math.round(scrollTop / ITEM_HEIGHT);
+        const clampedIndex = Math.max(0, Math.min(index, values.length - 1));
+        if (values[clampedIndex] !== selectedValue) {
+          onSelect(values[clampedIndex]);
+        }
+      }
+    }, 50);
   };
 
   return (

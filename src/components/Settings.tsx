@@ -375,7 +375,7 @@ export default function Settings() {
         onSelect={(seconds) => updateWorkout({ roundDuration: seconds })}
         initialValue={workout.roundDuration}
         title="Round Duration"
-        minMinutes={1}
+        minMinutes={0}
         maxMinutes={10}
         showSeconds={true}
         accentColor="#54f085"
