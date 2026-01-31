@@ -185,17 +185,17 @@ function TimerPage() {
   return (
     <Box
       bg="#0d1410"
-      minH="100vh"
+      h="100vh"
       color="white"
       maxW="480px"
       mx="auto"
       px={4}
-      pt={2}
-      pb={24}
+      py={2}
+      overflow="hidden"
     >
-      <Flex direction="column" gap={4}>
+      <Flex direction="column" h="full">
         {/* Header */}
-        <Box textAlign="center" py={4}>
+        <Box textAlign="center" py={2}>
           <Text
             fontSize="xs"
             fontWeight="black"
@@ -208,7 +208,7 @@ function TimerPage() {
         </Box>
 
         {/* Round Info */}
-        <Flex direction="column" align="center" gap={2}>
+        <Flex direction="column" align="center" gap={1}>
           <Heading size="lg" fontWeight="black">
             {phase === "complete" ? "Finished!" : phase === "prep" ? "Prepare" : `Round ${currentRound}/${roundCount}`}
           </Heading>
@@ -243,12 +243,13 @@ function TimerPage() {
         <Box
           position="relative"
           w="full"
-          maxW="340px"
+          maxW="280px"
           mx="auto"
           aspectRatio={1}
           display="flex"
           alignItems="center"
           justifyContent="center"
+          flex="0 0 auto"
         >
           <Box
             as="svg"
@@ -316,7 +317,7 @@ function TimerPage() {
             </Flex>
           ) : (
             <Text
-              fontSize={{ base: "7xl", sm: "9xl" }}
+              fontSize={{ base: "6xl", sm: "7xl" }}
               fontWeight="black"
               letterSpacing="-0.08em"
               color={getPhaseColor()}
@@ -335,13 +336,13 @@ function TimerPage() {
         </Box>
 
         {/* Stats Grid */}
-        <Grid templateColumns="repeat(2, 1fr)" gap={4} mb={8}>
+        <Grid templateColumns="repeat(2, 1fr)" gap={3} mb={3}>
           <Box
             bg="#161e19"
             borderWidth="1px"
             borderColor="#1f2923"
-            borderRadius="2xl"
-            p={6}
+            borderRadius="xl"
+            p={4}
             textAlign="center"
           >
             <Text
@@ -350,11 +351,11 @@ function TimerPage() {
               letterSpacing="0.2em"
               textTransform="uppercase"
               color="whiteAlpha.300"
-              mb={2}
+              mb={1}
             >
               Rest
             </Text>
-            <Text fontSize="3xl" fontWeight="black" fontFamily="mono">
+            <Text fontSize="2xl" fontWeight="black" fontFamily="mono">
               {formatTime(restTime)}
             </Text>
           </Box>
@@ -362,8 +363,8 @@ function TimerPage() {
             bg="#161e19"
             borderWidth="1px"
             borderColor="#1f2923"
-            borderRadius="2xl"
-            p={6}
+            borderRadius="xl"
+            p={4}
             textAlign="center"
           >
             <Text
@@ -372,27 +373,27 @@ function TimerPage() {
               letterSpacing="0.2em"
               textTransform="uppercase"
               color="whiteAlpha.300"
-              mb={2}
+              mb={1}
             >
               Total
             </Text>
-            <Text fontSize="3xl" fontWeight="black" fontFamily="mono">
+            <Text fontSize="2xl" fontWeight="black" fontFamily="mono">
               {formatTime(totalTimeElapsed)}
             </Text>
           </Box>
         </Grid>
 
         {/* Controls */}
-        <Flex direction="column" gap={4} mb={24}>
+        <Flex direction="column" gap={3} mt="auto" pb={4}>
           <Button
             w="full"
             size="lg"
             bg="#54f085"
             color="#0d1410"
-            py={7}
-            borderRadius="2xl"
+            py={5}
+            borderRadius="xl"
             fontWeight="black"
-            fontSize="xl"
+            fontSize="lg"
             letterSpacing="0.2em"
             onClick={toggleTimer}
             _hover={{ bg: "#4de079" }}
@@ -414,44 +415,44 @@ function TimerPage() {
             </Flex>
           </Button>
 
-          <Grid templateColumns="repeat(2, 1fr)" gap={4} w="full">
+          <Grid templateColumns="repeat(2, 1fr)" gap={3} w="full">
             <Button
               w="full"
-              size="lg"
+              size="md"
               variant="outline"
               borderWidth="2px"
               borderColor="#1f2923"
               color="white"
-              py={7}
-              borderRadius="2xl"
+              py={4}
+              borderRadius="xl"
               fontWeight="black"
               fontSize="sm"
               letterSpacing="0.2em"
               onClick={handleEditWorkout}
               _hover={{ bg: "whiteAlpha.50" }}
             >
-              <Flex align="center" gap={3}>
-                <Icon as={MdEdit} boxSize={5} />
+              <Flex align="center" gap={2}>
+                <Icon as={MdEdit} boxSize={4} />
                 <Text>EDIT</Text>
               </Flex>
             </Button>
             <Button
               w="full"
-              size="lg"
+              size="md"
               variant="outline"
               borderWidth="2px"
               borderColor="#1f2923"
               color="white"
-              py={7}
-              borderRadius="2xl"
+              py={4}
+              borderRadius="xl"
               fontWeight="black"
               fontSize="sm"
               letterSpacing="0.2em"
               onClick={resetTimer}
               _hover={{ bg: "whiteAlpha.50" }}
             >
-              <Flex align="center" gap={3}>
-                <Icon as={MdRefresh} boxSize={5} />
+              <Flex align="center" gap={2}>
+                <Icon as={MdRefresh} boxSize={4} />
                 <Text>RESET</Text>
               </Flex>
             </Button>
