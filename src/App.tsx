@@ -241,12 +241,13 @@ function TimerPage() {
       maxW="480px"
       mx="auto"
       px={4}
-      py={2}
+      pt="calc(env(safe-area-inset-top, 0px) + 8px)"
+      pb="calc(env(safe-area-inset-bottom, 0px) + 16px)"
       overflow="hidden"
     >
       <Flex direction="column" h="full">
         {/* Header */}
-        <Box textAlign="center" py={2}>
+        <Box textAlign="center" py={1}>
           <Text
             fontSize="xs"
             fontWeight="black"
