@@ -5,6 +5,7 @@ import { MdChevronLeft, MdAccessTime, MdCoffee, MdVolumeUp, MdFlashOn, MdNotific
 import { currentPageAtom, activeWorkoutAtom, appStateAtom, timeLeftAtom, currentRoundAtom, phaseAtom, totalTimeElapsedAtom, isRunningAtom, editingWorkoutIdAtom } from '../atoms';
 import { WorkoutConfig, DEFAULT_WORKOUT } from '../types';
 import { saveWorkout, generateId, setActiveWorkout, getAppState } from '../storage';
+import DurationPicker from './DurationPicker';
 
 export default function Settings() {
   const [, setCurrentPage] = useAtom(currentPageAtom);
@@ -19,6 +20,7 @@ export default function Settings() {
   
   const [workout, setWorkout] = useState<WorkoutConfig>({ ...activeWorkout });
   const [isNewWorkout, setIsNewWorkout] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState<'prep' | 'round' | 'rest' | null>(null);
 
   useEffect(() => {
     if (editingWorkoutId === 'new') {
@@ -84,27 +86,6 @@ export default function Settings() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const cycleRoundDuration = () => {
-    const options = [60, 90, 120, 180, 240, 300];
-    const currentIndex = options.indexOf(workout.roundDuration);
-    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % options.length;
-    updateWorkout({ roundDuration: options[nextIndex] });
-  };
-
-  const cycleRestDuration = () => {
-    const options = [30, 45, 60, 90, 120];
-    const currentIndex = options.indexOf(workout.restDuration);
-    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % options.length;
-    updateWorkout({ restDuration: options[nextIndex] });
-  };
-
-  const cyclePrepTime = () => {
-    const options = [0, 5, 10, 15, 30];
-    const currentIndex = options.indexOf(workout.preparationTime);
-    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % options.length;
-    updateWorkout({ preparationTime: options[nextIndex] });
-  };
-
   return (
     <Box bg="#0d1410" minH="100vh" color="white" px={5} pb={6}>
       <Flex direction="column" gap={6} maxW="md" mx="auto">
@@ -163,7 +144,7 @@ export default function Settings() {
             py={8}
             borderBottomWidth="1px"
             borderColor="whiteAlpha.100"
-            onClick={cyclePrepTime}
+            onClick={() => setPickerOpen('prep')}
             _hover={{ bg: 'whiteAlpha.50' }}
           >
             <Flex align="center" gap={4}>
@@ -197,7 +178,7 @@ export default function Settings() {
             py={8}
             borderBottomWidth="1px"
             borderColor="whiteAlpha.100"
-            onClick={cycleRoundDuration}
+            onClick={() => setPickerOpen('round')}
             _hover={{ bg: 'whiteAlpha.50' }}
           >
             <Flex align="center" gap={4}>
@@ -231,7 +212,7 @@ export default function Settings() {
             py={8}
             borderBottomWidth="1px"
             borderColor="whiteAlpha.100"
-            onClick={cycleRestDuration}
+            onClick={() => setPickerOpen('rest')}
             _hover={{ bg: 'whiteAlpha.50' }}
           >
             <Flex align="center" gap={4}>
@@ -375,6 +356,42 @@ export default function Settings() {
           {isNewWorkout ? 'Create Workout' : 'Save Changes'}
         </Button>
       </Flex>
+
+      <DurationPicker
+        isOpen={pickerOpen === 'prep'}
+        onClose={() => setPickerOpen(null)}
+        onSelect={(seconds) => updateWorkout({ preparationTime: seconds })}
+        initialValue={workout.preparationTime}
+        title="Prep Time"
+        minMinutes={0}
+        maxMinutes={1}
+        showSeconds={true}
+        accentColor="#facc15"
+      />
+
+      <DurationPicker
+        isOpen={pickerOpen === 'round'}
+        onClose={() => setPickerOpen(null)}
+        onSelect={(seconds) => updateWorkout({ roundDuration: seconds })}
+        initialValue={workout.roundDuration}
+        title="Round Duration"
+        minMinutes={1}
+        maxMinutes={10}
+        showSeconds={true}
+        accentColor="#54f085"
+      />
+
+      <DurationPicker
+        isOpen={pickerOpen === 'rest'}
+        onClose={() => setPickerOpen(null)}
+        onSelect={(seconds) => updateWorkout({ restDuration: seconds })}
+        initialValue={workout.restDuration}
+        title="Rest Duration"
+        minMinutes={0}
+        maxMinutes={5}
+        showSeconds={true}
+        accentColor="#fb923c"
+      />
     </Box>
   );
 }

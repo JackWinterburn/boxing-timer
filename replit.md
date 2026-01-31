@@ -14,6 +14,7 @@ A mobile-first boxing timer application built with React, Vite, TypeScript, Jota
   - `components/` - React components
     - `Settings.tsx` - Workout settings/editor page
     - `WorkoutSelector.tsx` - Saved workouts menu with edit/delete
+    - `DurationPicker.tsx` - Modal wheel-style time picker for duration settings
 
 ## Tech Stack
 - React 18
