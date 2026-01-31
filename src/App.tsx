@@ -31,102 +31,37 @@ const getAudioContext = () => {
   return audioContextRef.current;
 };
 
-const playBellStrike = (volume: number = 0.7) => {
+const playBeep = (frequency: number, duration: number, volume: number = 0.5) => {
   try {
     const ctx = getAudioContext();
-    const now = ctx.currentTime;
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
     
-    const masterGain = ctx.createGain();
-    const compressor = ctx.createDynamicsCompressor();
-    masterGain.connect(compressor);
-    compressor.connect(ctx.destination);
-    masterGain.gain.setValueAtTime(volume, now);
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
     
-    const fundamentalFreq = 420;
-    const bellPartials = [
-      { ratio: 1.0, amp: 1.0, decay: 2.0 },
-      { ratio: 2.0, amp: 0.8, decay: 1.5 },
-      { ratio: 2.42, amp: 0.65, decay: 1.8 },
-      { ratio: 3.0, amp: 0.5, decay: 1.2 },
-      { ratio: 4.16, amp: 0.35, decay: 1.0 },
-      { ratio: 5.43, amp: 0.25, decay: 0.8 },
-      { ratio: 6.8, amp: 0.15, decay: 0.6 },
-    ];
+    oscillator.frequency.value = frequency;
+    oscillator.type = "sine";
     
-    bellPartials.forEach((partial) => {
-      const osc = ctx.createOscillator();
-      const oscGain = ctx.createGain();
-      
-      osc.connect(oscGain);
-      oscGain.connect(masterGain);
-      
-      osc.frequency.value = fundamentalFreq * partial.ratio;
-      osc.type = "sine";
-      
-      oscGain.gain.setValueAtTime(partial.amp * 0.15, now);
-      oscGain.gain.setValueAtTime(partial.amp * 0.15, now + 0.002);
-      oscGain.gain.exponentialRampToValueAtTime(0.001, now + partial.decay);
-      
-      osc.start(now);
-      osc.stop(now + partial.decay + 0.1);
-    });
+    gainNode.gain.setValueAtTime(volume, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
     
-    const strikeOsc = ctx.createOscillator();
-    const strikeGain = ctx.createGain();
-    const strikeFilter = ctx.createBiquadFilter();
-    
-    strikeOsc.connect(strikeFilter);
-    strikeFilter.connect(strikeGain);
-    strikeGain.connect(masterGain);
-    
-    strikeOsc.frequency.value = 1800;
-    strikeOsc.type = "triangle";
-    strikeFilter.type = "bandpass";
-    strikeFilter.frequency.value = 2000;
-    strikeFilter.Q.value = 2;
-    
-    strikeGain.gain.setValueAtTime(0.4, now);
-    strikeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.015);
-    
-    strikeOsc.start(now);
-    strikeOsc.stop(now + 0.02);
-    
-    const noiseLen = 0.03;
-    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * noiseLen, ctx.sampleRate);
-    const noiseData = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < noiseData.length; i++) {
-      noiseData[i] = (Math.random() * 2 - 1);
-    }
-    
-    const noiseSource = ctx.createBufferSource();
-    const noiseGain = ctx.createGain();
-    const noiseFilter = ctx.createBiquadFilter();
-    
-    noiseSource.buffer = noiseBuffer;
-    noiseSource.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(masterGain);
-    
-    noiseFilter.type = "highpass";
-    noiseFilter.frequency.value = 3000;
-    
-    noiseGain.gain.setValueAtTime(0.25, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
-    
-    noiseSource.start(now);
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + duration);
   } catch (e) {
     console.log("Audio not supported");
   }
 };
 
 const playWorkStartSound = () => {
-  playBellStrike(0.8);
+  playBeep(880, 0.15, 0.6);
+  setTimeout(() => playBeep(1100, 0.15, 0.6), 150);
+  setTimeout(() => playBeep(1320, 0.2, 0.7), 300);
 };
 
 const playWorkEndSound = () => {
-  playBellStrike(0.7);
-  setTimeout(() => playBellStrike(0.6), 300);
-  setTimeout(() => playBellStrike(0.5), 600);
+  playBeep(660, 0.3, 0.5);
+  setTimeout(() => playBeep(440, 0.4, 0.5), 300);
 };
 
 function TimerPage() {
