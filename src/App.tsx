@@ -34,44 +34,86 @@ const getAudioContext = () => {
 const playBellStrike = (volume: number = 0.7) => {
   try {
     const ctx = getAudioContext();
-    const baseFreq = 800;
-    const harmonics = [1, 2.4, 3.8, 5.2];
-    const gains = [1, 0.6, 0.3, 0.15];
+    const now = ctx.currentTime;
     
     const masterGain = ctx.createGain();
-    masterGain.connect(ctx.destination);
-    masterGain.gain.setValueAtTime(volume, ctx.currentTime);
-    masterGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+    const compressor = ctx.createDynamicsCompressor();
+    masterGain.connect(compressor);
+    compressor.connect(ctx.destination);
+    masterGain.gain.setValueAtTime(volume, now);
     
-    harmonics.forEach((harmonic, i) => {
+    const fundamentalFreq = 420;
+    const bellPartials = [
+      { ratio: 1.0, amp: 1.0, decay: 2.0 },
+      { ratio: 2.0, amp: 0.8, decay: 1.5 },
+      { ratio: 2.42, amp: 0.65, decay: 1.8 },
+      { ratio: 3.0, amp: 0.5, decay: 1.2 },
+      { ratio: 4.16, amp: 0.35, decay: 1.0 },
+      { ratio: 5.43, amp: 0.25, decay: 0.8 },
+      { ratio: 6.8, amp: 0.15, decay: 0.6 },
+    ];
+    
+    bellPartials.forEach((partial) => {
       const osc = ctx.createOscillator();
       const oscGain = ctx.createGain();
       
       osc.connect(oscGain);
       oscGain.connect(masterGain);
       
-      osc.frequency.value = baseFreq * harmonic;
+      osc.frequency.value = fundamentalFreq * partial.ratio;
       osc.type = "sine";
-      oscGain.gain.setValueAtTime(gains[i] * 0.3, ctx.currentTime);
-      oscGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2 / (i + 1));
       
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 1.5);
+      oscGain.gain.setValueAtTime(partial.amp * 0.15, now);
+      oscGain.gain.setValueAtTime(partial.amp * 0.15, now + 0.002);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, now + partial.decay);
+      
+      osc.start(now);
+      osc.stop(now + partial.decay + 0.1);
     });
     
-    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.1, ctx.sampleRate);
+    const strikeOsc = ctx.createOscillator();
+    const strikeGain = ctx.createGain();
+    const strikeFilter = ctx.createBiquadFilter();
+    
+    strikeOsc.connect(strikeFilter);
+    strikeFilter.connect(strikeGain);
+    strikeGain.connect(masterGain);
+    
+    strikeOsc.frequency.value = 1800;
+    strikeOsc.type = "triangle";
+    strikeFilter.type = "bandpass";
+    strikeFilter.frequency.value = 2000;
+    strikeFilter.Q.value = 2;
+    
+    strikeGain.gain.setValueAtTime(0.4, now);
+    strikeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.015);
+    
+    strikeOsc.start(now);
+    strikeOsc.stop(now + 0.02);
+    
+    const noiseLen = 0.03;
+    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * noiseLen, ctx.sampleRate);
     const noiseData = noiseBuffer.getChannelData(0);
     for (let i = 0; i < noiseData.length; i++) {
-      noiseData[i] = (Math.random() * 2 - 1) * 0.1;
+      noiseData[i] = (Math.random() * 2 - 1);
     }
+    
     const noiseSource = ctx.createBufferSource();
-    noiseSource.buffer = noiseBuffer;
     const noiseGain = ctx.createGain();
-    noiseSource.connect(noiseGain);
+    const noiseFilter = ctx.createBiquadFilter();
+    
+    noiseSource.buffer = noiseBuffer;
+    noiseSource.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
     noiseGain.connect(masterGain);
-    noiseGain.gain.setValueAtTime(0.3, ctx.currentTime);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-    noiseSource.start(ctx.currentTime);
+    
+    noiseFilter.type = "highpass";
+    noiseFilter.frequency.value = 3000;
+    
+    noiseGain.gain.setValueAtTime(0.25, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+    
+    noiseSource.start(now);
   } catch (e) {
     console.log("Audio not supported");
   }
