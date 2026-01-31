@@ -139,14 +139,10 @@ export default function App() {
             
             <div className="flex flex-col items-center justify-center z-10">
               <div className={cn(
-                "text-7xl sm:text-8xl font-black tracking-[-0.05em] leading-none mb-2",
+                "text-8xl sm:text-9xl font-black tracking-[-0.05em] leading-none",
                 phase === 'work' ? "text-[#54f085] [text-shadow:0_0_20px_rgba(84,240,133,0.5)]" : "text-orange-400"
               )}>
                 {formatTime(timeLeft)}
-              </div>
-              <div className="flex gap-8 text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
-                <span>Minutes</span>
-                <span>Seconds</span>
               </div>
             </div>
           </div>
@@ -182,36 +178,36 @@ export default function App() {
         </div>
 
         {/* Controls */}
-        <div className="space-y-3 mt-auto shrink-0">
+        <div className="space-y-4 mt-auto mb-6 shrink-0">
           <button 
             onClick={toggleTimer}
-            className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-4 rounded-[20px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none shadow-[0_4px_20px_rgba(84,240,133,0.2)]"
+            className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-5 rounded-[20px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none shadow-[0_4px_25px_rgba(84,240,133,0.25)]"
           >
             {isRunning ? (
               <>
                 <Pause className="w-5 h-5 fill-current" />
-                <span className="text-[13px] tracking-[0.1em]">Pause</span>
+                <span className="text-[14px] tracking-[0.2em]">Pause</span>
               </>
             ) : (
               <>
                 <Play className="w-5 h-5 fill-current ml-1" />
-                <span className="text-[13px] tracking-[0.1em]">Start</span>
+                <span className="text-[14px] tracking-[0.2em]">Start</span>
               </>
             )}
           </button>
           
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <button 
               disabled={!isRunning}
               onClick={() => setIsRunning(false)}
-              className="flex items-center justify-center gap-2 py-4 bg-[#161e19] hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed rounded-[20px] font-black uppercase text-[11px] tracking-[0.1em] transition-colors border border-[#1f2923] text-white/80"
+              className="flex items-center justify-center gap-2 py-4 bg-[#161e19] hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed rounded-[20px] font-black uppercase text-[11px] tracking-[0.2em] transition-colors border border-[#1f2923] text-white/90"
             >
               <Pause className="w-4 h-4 fill-current" />
               Pause
             </button>
             <button 
               onClick={resetTimer}
-              className="flex items-center justify-center gap-2 py-4 bg-[#161e19] hover:bg-white/5 rounded-[20px] font-black uppercase text-[11px] tracking-[0.1em] transition-colors border border-[#1f2923] text-white/80"
+              className="flex items-center justify-center gap-2 py-4 bg-[#161e19] hover:bg-white/5 rounded-[20px] font-black uppercase text-[11px] tracking-[0.2em] transition-colors border border-[#1f2923] text-white/90"
             >
               <RotateCcw className="w-4 h-4" />
               Reset
