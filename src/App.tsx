@@ -31,37 +31,60 @@ const getAudioContext = () => {
   return audioContextRef.current;
 };
 
-const playBeep = (frequency: number, duration: number, volume: number = 0.5) => {
+const playBellStrike = (volume: number = 0.7) => {
   try {
     const ctx = getAudioContext();
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
+    const baseFreq = 800;
+    const harmonics = [1, 2.4, 3.8, 5.2];
+    const gains = [1, 0.6, 0.3, 0.15];
     
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
+    const masterGain = ctx.createGain();
+    masterGain.connect(ctx.destination);
+    masterGain.gain.setValueAtTime(volume, ctx.currentTime);
+    masterGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
     
-    oscillator.frequency.value = frequency;
-    oscillator.type = "sine";
+    harmonics.forEach((harmonic, i) => {
+      const osc = ctx.createOscillator();
+      const oscGain = ctx.createGain();
+      
+      osc.connect(oscGain);
+      oscGain.connect(masterGain);
+      
+      osc.frequency.value = baseFreq * harmonic;
+      osc.type = "sine";
+      oscGain.gain.setValueAtTime(gains[i] * 0.3, ctx.currentTime);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2 / (i + 1));
+      
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 1.5);
+    });
     
-    gainNode.gain.setValueAtTime(volume, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-    
-    oscillator.start(ctx.currentTime);
-    oscillator.stop(ctx.currentTime + duration);
+    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.1, ctx.sampleRate);
+    const noiseData = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < noiseData.length; i++) {
+      noiseData[i] = (Math.random() * 2 - 1) * 0.1;
+    }
+    const noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = noiseBuffer;
+    const noiseGain = ctx.createGain();
+    noiseSource.connect(noiseGain);
+    noiseGain.connect(masterGain);
+    noiseGain.gain.setValueAtTime(0.3, ctx.currentTime);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+    noiseSource.start(ctx.currentTime);
   } catch (e) {
     console.log("Audio not supported");
   }
 };
 
 const playWorkStartSound = () => {
-  playBeep(880, 0.15, 0.6);
-  setTimeout(() => playBeep(1100, 0.15, 0.6), 150);
-  setTimeout(() => playBeep(1320, 0.2, 0.7), 300);
+  playBellStrike(0.8);
 };
 
 const playWorkEndSound = () => {
-  playBeep(660, 0.3, 0.5);
-  setTimeout(() => playBeep(440, 0.4, 0.5), 300);
+  playBellStrike(0.7);
+  setTimeout(() => playBellStrike(0.6), 300);
+  setTimeout(() => playBellStrike(0.5), 600);
 };
 
 function TimerPage() {
