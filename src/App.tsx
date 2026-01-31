@@ -158,49 +158,49 @@ function TimerPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-4 shrink-0">
-          <div className="bg-[#161e19] border border-[#1f2923] rounded-2xl p-3 text-center flex flex-col justify-center items-center">
-            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Rest</span>
-            <span className="text-lg font-black tabular-nums">{formatTime(restTime)}</span>
+        <div className="grid grid-cols-2 gap-4 mb-8 shrink-0">
+          <div className="bg-[#161e19] border border-[#1f2923] rounded-2xl p-6 text-center flex flex-col justify-center items-center shadow-inner">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2">Rest</span>
+            <span className="text-3xl font-black tabular-nums">{formatTime(restTime)}</span>
           </div>
-          <div className="bg-[#161e19] border border-[#1f2923] rounded-2xl p-3 text-center flex flex-col justify-center items-center">
-            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Total</span>
-            <span className="text-lg font-black tabular-nums">{formatTime(totalTimeElapsed)}</span>
+          <div className="bg-[#161e19] border border-[#1f2923] rounded-2xl p-6 text-center flex flex-col justify-center items-center shadow-inner">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2">Total</span>
+            <span className="text-3xl font-black tabular-nums">{formatTime(totalTimeElapsed)}</span>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="space-y-3 shrink-0 mb-40 pb-12">
+        <div className="space-y-4 shrink-0 mb-24">
           <button 
             onClick={toggleTimer}
-            className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-4 rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none shadow-[0_4px_25px_rgba(84,240,133,0.25)]"
+            className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] border-none shadow-[0_10px_30px_rgba(84,240,133,0.3)]"
           >
             {isRunning ? (
               <>
-                <Pause className="w-5 h-5 fill-current" />
-                <span className="text-sm tracking-[0.2em]">Pause</span>
+                <Pause className="w-6 h-6 fill-current" />
+                <span className="text-lg tracking-[0.2em]">Pause</span>
               </>
             ) : (
               <>
-                <Play className="w-5 h-5 fill-current ml-1" />
-                <span className="text-sm tracking-[0.2em]">Start</span>
+                <Play className="w-6 h-6 fill-current ml-1" />
+                <span className="text-lg tracking-[0.2em]">Start</span>
               </>
             )}
           </button>
           
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <button 
               onClick={() => setCurrentPage('settings')}
-              className="flex items-center justify-center gap-2 py-3 bg-[#161e19] hover:bg-white/5 rounded-2xl font-black uppercase text-[11px] tracking-[0.15em] transition-colors border border-[#1f2923] text-white/90"
+              className="flex items-center justify-center gap-3 py-5 bg-transparent hover:bg-white/5 rounded-2xl font-black uppercase text-sm tracking-[0.2em] transition-colors border-2 border-[#1f2923] text-white"
             >
-              <SettingsIcon className="w-4 h-4" />
+              <Pause className="w-5 h-5 fill-current" />
               Settings
             </button>
             <button 
               onClick={resetTimer}
-              className="flex items-center justify-center gap-2 py-3 bg-[#161e19] hover:bg-white/5 rounded-2xl font-black uppercase text-[11px] tracking-[0.15em] transition-colors border border-[#1f2923] text-white/90"
+              className="flex items-center justify-center gap-3 py-5 bg-transparent hover:bg-white/5 rounded-2xl font-black uppercase text-sm tracking-[0.2em] transition-colors border-2 border-[#1f2923] text-white"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-5 h-5" />
               Reset
             </button>
           </div>
