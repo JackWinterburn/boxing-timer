@@ -86,7 +86,7 @@ function TimerPage() {
     : (1 - timeLeft / restTime) * 100;
 
   return (
-    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 px-4 pt-2 pb-4 safe-area-inset overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 px-4 pt-2 pb-8 safe-area-inset overflow-hidden">
       <div className="flex-1 flex flex-col max-w-md mx-auto w-full overflow-hidden">
         {/* Header */}
         <header className="flex items-center justify-between py-4">
@@ -157,23 +157,6 @@ function TimerPage() {
           </div>
         </div>
 
-        {/* Progress Bar Area */}
-        <div className="mb-4 space-y-2 shrink-0">
-          <div className="flex justify-between items-center">
-            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">Round Progress</span>
-            <span className="text-[10px] font-black text-[#54f085]">{Math.round(progress)}%</span>
-          </div>
-          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-            <div 
-              className={cn(
-                "h-full transition-all duration-300 rounded-full",
-                phase === 'work' ? "bg-[#54f085]" : "bg-orange-400"
-              )}
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3 mb-4 shrink-0">
           <div className="bg-[#161e19] border border-[#1f2923] rounded-2xl p-3 text-center flex flex-col justify-center items-center">
@@ -187,7 +170,7 @@ function TimerPage() {
         </div>
 
         {/* Controls */}
-        <div className="space-y-3 shrink-0 pb-2">
+        <div className="space-y-3 shrink-0 mb-8">
           <button 
             onClick={toggleTimer}
             className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-4 rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none shadow-[0_4px_25px_rgba(84,240,133,0.25)]"
