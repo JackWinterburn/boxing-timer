@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useAtom } from "jotai";
 import { Box, Flex, Text, Button, Heading, Grid, Icon } from "@chakra-ui/react";
 import { FaPlay, FaPause, FaCheck } from "react-icons/fa";
@@ -15,6 +15,54 @@ import {
 } from "./atoms";
 import Settings from "./components/Settings";
 import WorkoutSelector from "./components/WorkoutSelector";
+
+// Wake Lock API for keeping screen on
+const useWakeLock = (enabled: boolean) => {
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  const requestWakeLock = useCallback(async () => {
+    if ('wakeLock' in navigator) {
+      try {
+        wakeLockRef.current = await navigator.wakeLock.request('screen');
+      } catch (err) {
+        console.log('Wake Lock request failed:', err);
+      }
+    }
+  }, []);
+
+  const releaseWakeLock = useCallback(async () => {
+    if (wakeLockRef.current) {
+      try {
+        await wakeLockRef.current.release();
+        wakeLockRef.current = null;
+      } catch (err) {
+        console.log('Wake Lock release failed:', err);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (enabled) {
+      requestWakeLock();
+    } else {
+      releaseWakeLock();
+    }
+
+    // Re-acquire wake lock when page becomes visible again
+    const handleVisibilityChange = () => {
+      if (enabled && document.visibilityState === 'visible') {
+        requestWakeLock();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      releaseWakeLock();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [enabled, requestWakeLock, releaseWakeLock]);
+};
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
@@ -73,6 +121,9 @@ function TimerPage() {
   const [totalTimeElapsed, setTotalTimeElapsed] = useAtom(totalTimeElapsedAtom);
   const [, setCurrentPage] = useAtom(currentPageAtom);
   const [, setEditingWorkoutId] = useAtom(editingWorkoutIdAtom);
+
+  // Keep screen on while timer is running
+  useWakeLock(isRunning);
 
   const timerRef = useRef<number | null>(null);
 
