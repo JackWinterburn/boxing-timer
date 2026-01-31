@@ -170,7 +170,7 @@ function TimerPage() {
         </div>
 
         {/* Controls */}
-        <div className="space-y-3 shrink-0 mb-16 pb-4">
+        <div className="space-y-3 shrink-0 mb-40 pb-12">
           <button 
             onClick={toggleTimer}
             className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-4 rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none shadow-[0_4px_25px_rgba(84,240,133,0.25)]"
