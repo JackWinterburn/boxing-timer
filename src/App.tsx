@@ -82,11 +82,10 @@ export default function App() {
     : (1 - timeLeft / restTime) * 100;
 
   const circum = 2 * Math.PI * 90;
-  const strokeDashoffset = circum - (progress / 100) * circum;
 
   return (
-    <div className="flex flex-col h-screen bg-boxing-bg text-white font-sans selection:bg-boxing-primary/30 p-4 pb-8 safe-area-inset">
-      <div className="flex-1 flex flex-col max-w-md mx-auto w-full">
+    <div className="flex flex-col h-screen bg-[#0d1410] text-white font-sans selection:bg-[#54f085]/30 p-4 pb-8 safe-area-inset overflow-hidden">
+      <div className="flex-1 flex flex-col max-w-md mx-auto w-full overflow-hidden">
         {/* Header */}
         <header className="flex items-center justify-between py-4">
           <button className="p-2 hover:bg-white/5 rounded-full transition-colors border-none bg-transparent">
@@ -97,55 +96,55 @@ export default function App() {
         </header>
 
         {/* Round Info */}
-        <div className="text-center mt-4">
+        <div className="text-center mt-4 shrink-0">
           <h2 className="text-3xl font-black mb-1 tracking-tight">Round {currentRound}/{roundCount}</h2>
           <p className={cn(
             "text-[10px] font-black tracking-[0.2em] uppercase",
-            phase === 'work' ? "text-boxing-primary" : "text-orange-400"
+            phase === 'work' ? "text-[#54f085]" : "text-orange-400"
           )}>
             {phase === 'work' ? 'Work Phase' : 'Rest Phase'}
           </p>
         </div>
 
         {/* Main Timer Display */}
-        <div className="flex-1 flex flex-col items-center justify-center min-h-0 py-8">
-          <div className="relative w-[80vw] max-w-[320px] aspect-square flex items-center justify-center">
-            <svg className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-[0_0_20px_rgba(84,240,133,0.1)]">
+        <div className="flex-1 flex flex-col items-center justify-center min-h-0 py-4 shrink">
+          <div className="relative w-full max-w-[280px] aspect-square flex items-center justify-center">
+            <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 200 200">
               {/* Background Circle */}
               <circle
-                cx="50%"
-                cy="50%"
-                r="45%"
+                cx="100"
+                cy="100"
+                r="90"
                 fill="none"
                 stroke="rgba(255,255,255,0.05)"
-                strokeWidth="1.5"
+                strokeWidth="4"
               />
               {/* Progress Circle */}
               <circle
-                cx="50%"
-                cy="50%"
-                r="45%"
+                cx="100"
+                cy="100"
+                r="90"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="3"
-                strokeDasharray="283%"
-                strokeDashoffset={`${283 - (progress * 2.83)}%`}
+                strokeWidth="6"
+                strokeDasharray={circum}
+                strokeDashoffset={circum - (progress / 100) * circum}
                 strokeLinecap="round"
                 className={cn(
                   "transition-all duration-300",
-                  phase === 'work' ? "text-boxing-primary drop-shadow-glow" : "text-orange-400"
+                  phase === 'work' ? "text-[#54f085] drop-shadow-[0_0_10px_rgba(84,240,133,0.4)]" : "text-orange-400"
                 )}
               />
             </svg>
             
-            <div className="flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center z-10">
               <div className={cn(
-                "text-[25vw] sm:text-[100px] font-black tracking-[-0.05em] leading-none mb-4",
-                phase === 'work' ? "text-boxing-primary text-glow" : "text-orange-400"
+                "text-7xl sm:text-8xl font-black tracking-[-0.05em] leading-none mb-2",
+                phase === 'work' ? "text-[#54f085] [text-shadow:0_0_20px_rgba(84,240,133,0.5)]" : "text-orange-400"
               )}>
                 {formatTime(timeLeft)}
               </div>
-              <div className="flex gap-12 text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
+              <div className="flex gap-8 text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
                 <span>Minutes</span>
                 <span>Seconds</span>
               </div>
@@ -154,16 +153,16 @@ export default function App() {
         </div>
 
         {/* Progress Bar Area */}
-        <div className="mb-8 space-y-3">
+        <div className="mb-6 space-y-3 shrink-0">
           <div className="flex justify-between items-center">
             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">Round Progress</span>
-            <span className="text-[10px] font-black text-boxing-primary">{Math.round(progress)}%</span>
+            <span className="text-[10px] font-black text-[#54f085]">{Math.round(progress)}%</span>
           </div>
           <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
             <div 
               className={cn(
                 "h-full transition-all duration-300 rounded-full",
-                phase === 'work' ? "bg-boxing-primary" : "bg-orange-400"
+                phase === 'work' ? "bg-[#54f085]" : "bg-orange-400"
               )}
               style={{ width: `${progress}%` }}
             />
@@ -171,22 +170,22 @@ export default function App() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-10">
-          <div className="bg-boxing-card border border-boxing-border rounded-[20px] p-5 text-center flex flex-col justify-center items-center">
-            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20 mb-2">Rest</span>
+        <div className="grid grid-cols-2 gap-3 mb-8 shrink-0">
+          <div className="bg-[#161e19] border border-[#1f2923] rounded-[20px] p-4 text-center flex flex-col justify-center items-center">
+            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Rest</span>
             <span className="text-xl font-black tabular-nums">{formatTime(restTime)}</span>
           </div>
-          <div className="bg-boxing-card border border-boxing-border rounded-[20px] p-5 text-center flex flex-col justify-center items-center">
-            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20 mb-2">Total</span>
+          <div className="bg-[#161e19] border border-[#1f2923] rounded-[20px] p-4 text-center flex flex-col justify-center items-center">
+            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Total</span>
             <span className="text-xl font-black tabular-nums">{formatTime(totalTimeElapsed)}</span>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="space-y-3 mt-auto">
+        <div className="space-y-3 mt-auto shrink-0">
           <button 
             onClick={toggleTimer}
-            className="w-full bg-boxing-primary hover:bg-boxing-primary/90 text-boxing-bg font-black uppercase py-5 rounded-[20px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none shadow-[0_4px_20px_rgba(84,240,133,0.3)]"
+            className="w-full bg-[#54f085] hover:bg-[#54f085]/90 text-[#0d1410] font-black uppercase py-4 rounded-[20px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] border-none shadow-[0_4px_20px_rgba(84,240,133,0.2)]"
           >
             {isRunning ? (
               <>
@@ -205,14 +204,14 @@ export default function App() {
             <button 
               disabled={!isRunning}
               onClick={() => setIsRunning(false)}
-              className="flex items-center justify-center gap-2 py-5 bg-boxing-card hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed rounded-[20px] font-black uppercase text-[11px] tracking-[0.1em] transition-colors border border-boxing-border text-white/80"
+              className="flex items-center justify-center gap-2 py-4 bg-[#161e19] hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed rounded-[20px] font-black uppercase text-[11px] tracking-[0.1em] transition-colors border border-[#1f2923] text-white/80"
             >
               <Pause className="w-4 h-4 fill-current" />
               Pause
             </button>
             <button 
               onClick={resetTimer}
-              className="flex items-center justify-center gap-2 py-5 bg-boxing-card hover:bg-white/5 rounded-[20px] font-black uppercase text-[11px] tracking-[0.1em] transition-colors border border-boxing-border text-white/80"
+              className="flex items-center justify-center gap-2 py-4 bg-[#161e19] hover:bg-white/5 rounded-[20px] font-black uppercase text-[11px] tracking-[0.1em] transition-colors border border-[#1f2923] text-white/80"
             >
               <RotateCcw className="w-4 h-4" />
               Reset

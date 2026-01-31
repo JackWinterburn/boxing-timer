@@ -1,20 +1,22 @@
-# Vite React Project
+# Boxing Timer App
 
 ## Overview
-A React application bootstrapped with Vite and TypeScript.
+A mobile-first boxing timer application built with React, Vite, TypeScript, and Jotai.
 
 ## Project Structure
 - `src/` - React source code
-  - `App.tsx` - Main application component
+  - `App.tsx` - Main application component (Timer logic and UI)
+  - `atoms.ts` - Jotai state atoms
   - `main.tsx` - Application entry point
-  - `assets/` - Static assets
-- `public/` - Public static files
+  - `index.css` - Tailwind CSS styles
 - `index.html` - HTML entry point
 
 ## Tech Stack
 - React 18
-- TypeScript
-- Vite 5
+- Jotai (State Management)
+- Tailwind CSS (Styling)
+- Lucide React (Icons)
+- Vite 5 (Build System)
 
 ## Development
 The dev server runs on port 5000 with:
@@ -27,5 +29,9 @@ npm run dev
 npm run build
 ```
 
-## Recent Changes
-- 2026-01-31: Configured Vite for Replit environment (port 5000, allowedHosts)
+## Features
+- Work and Rest phases
+- Round tracking
+- Total time tracking
+- Mobile-optimized layout
+- Neon green/dark aesthetic
