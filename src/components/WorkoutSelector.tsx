@@ -110,7 +110,6 @@ export default function WorkoutSelector() {
           {appState.workouts.map((workout) => (
             <Box
               key={workout.id}
-              as="button"
               w="full"
               p={5}
               textAlign="left"
@@ -122,6 +121,9 @@ export default function WorkoutSelector() {
               cursor="pointer"
               _hover={{ borderColor: activeWorkout.id === workout.id ? '#54f085' : 'whiteAlpha.200' }}
               transition="all 0.2s"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && handleSelectWorkout(workout)}
             >
               <Flex justify="space-between" align="center">
                 <Box flex={1}>
@@ -139,27 +141,29 @@ export default function WorkoutSelector() {
                   </Text>
                 </Box>
                 <Flex gap={1}>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    color="whiteAlpha.600"
-                    onClick={(e) => handleEditWorkout(workout.id, e)}
-                    _hover={{ bg: 'whiteAlpha.100' }}
+                  <Box
+                    as="span"
                     p={2}
+                    borderRadius="md"
+                    color="whiteAlpha.600"
+                    cursor="pointer"
+                    onClick={(e: React.MouseEvent) => handleEditWorkout(workout.id, e)}
+                    _hover={{ bg: 'whiteAlpha.100' }}
                   >
                     <Icon as={MdEdit} boxSize={4} />
-                  </Button>
+                  </Box>
                   {workout.id !== 'default' && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      color="red.400"
-                      onClick={(e) => handleDeleteWorkout(workout.id, e)}
-                      _hover={{ bg: 'rgba(245,101,101,0.2)' }}
+                    <Box
+                      as="span"
                       p={2}
+                      borderRadius="md"
+                      color="red.400"
+                      cursor="pointer"
+                      onClick={(e: React.MouseEvent) => handleDeleteWorkout(workout.id, e)}
+                      _hover={{ bg: 'rgba(245,101,101,0.2)' }}
                     >
                       <Icon as={MdDelete} boxSize={4} />
-                    </Button>
+                    </Box>
                   )}
                 </Flex>
               </Flex>
