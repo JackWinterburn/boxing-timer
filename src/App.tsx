@@ -1,16 +1,17 @@
 import { useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
-import { ChevronLeft, Play, Pause, RotateCcw } from 'lucide-react';
+import { ChevronLeft, Play, Pause, RotateCcw, Settings as SettingsIcon, ChevronDown } from 'lucide-react';
 import { 
   currentRoundAtom, 
-  roundCountAtom, 
   timeLeftAtom, 
   isRunningAtom, 
   phaseAtom, 
-  workTimeAtom, 
-  restTimeAtom,
-  totalTimeElapsedAtom 
+  totalTimeElapsedAtom,
+  currentPageAtom,
+  activeWorkoutAtom
 } from './atoms';
+import Settings from './components/Settings';
+import WorkoutSelector from './components/WorkoutSelector';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -24,17 +25,20 @@ const formatTime = (seconds: number) => {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
 
-export default function App() {
+function TimerPage() {
+  const [activeWorkout] = useAtom(activeWorkoutAtom);
   const [currentRound, setCurrentRound] = useAtom(currentRoundAtom);
-  const [roundCount] = useAtom(roundCountAtom);
   const [timeLeft, setTimeLeft] = useAtom(timeLeftAtom);
   const [isRunning, setIsRunning] = useAtom(isRunningAtom);
   const [phase, setPhase] = useAtom(phaseAtom);
-  const [workTime] = useAtom(workTimeAtom);
-  const [restTime] = useAtom(restTimeAtom);
   const [totalTimeElapsed, setTotalTimeElapsed] = useAtom(totalTimeElapsedAtom);
+  const [, setCurrentPage] = useAtom(currentPageAtom);
 
   const timerRef = useRef<number | null>(null);
+
+  const workTime = activeWorkout.roundDuration;
+  const restTime = activeWorkout.restDuration;
+  const roundCount = activeWorkout.totalRounds;
 
   useEffect(() => {
     if (isRunning) {
@@ -97,11 +101,18 @@ export default function App() {
         <div className="text-center mt-4 shrink-0">
           <h2 className="text-3xl font-black mb-1 tracking-tight">Round {currentRound}/{roundCount}</h2>
           <p className={cn(
-            "text-[10px] font-black tracking-[0.2em] uppercase",
+            "text-[10px] font-black tracking-[0.2em] uppercase mb-2",
             phase === 'work' ? "text-[#54f085]" : "text-orange-400"
           )}>
             {phase === 'work' ? 'Work Phase' : 'Rest Phase'}
           </p>
+          <button 
+            onClick={() => setCurrentPage('workouts')}
+            className="inline-flex items-center gap-1 text-[10px] font-medium tracking-[0.1em] uppercase px-3 py-1.5 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors text-white/70"
+          >
+            {activeWorkout.name}
+            <ChevronDown className="w-3 h-3" />
+          </button>
         </div>
 
         {/* Main Timer Display */}
@@ -196,12 +207,11 @@ export default function App() {
           
           <div className="grid grid-cols-2 gap-4">
             <button 
-              disabled={!isRunning}
-              onClick={() => setIsRunning(false)}
-              className="flex items-center justify-center gap-2 py-4 bg-[#161e19] hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed rounded-[20px] font-black uppercase text-[11px] tracking-[0.2em] transition-colors border border-[#1f2923] text-white/90"
+              onClick={() => setCurrentPage('settings')}
+              className="flex items-center justify-center gap-2 py-4 bg-[#161e19] hover:bg-white/5 rounded-[20px] font-black uppercase text-[11px] tracking-[0.2em] transition-colors border border-[#1f2923] text-white/90"
             >
-              <Pause className="w-4 h-4 fill-current" />
-              Pause
+              <SettingsIcon className="w-4 h-4" />
+              Settings
             </button>
             <button 
               onClick={resetTimer}
@@ -215,4 +225,17 @@ export default function App() {
       </div>
     </div>
   );
+}
+
+export default function App() {
+  const [currentPage] = useAtom(currentPageAtom);
+
+  switch (currentPage) {
+    case 'settings':
+      return <Settings />;
+    case 'workouts':
+      return <WorkoutSelector />;
+    default:
+      return <TimerPage />;
+  }
 }
